@@ -1,2 +1,2 @@
-from classes import app
-application = app.App()
+from classes.app import App
+application = App()
