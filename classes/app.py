@@ -1,23 +1,27 @@
+"""Importovanie knižníc, ktoré použijeme."""
 import tkinter as tk
-import random
 import networkx as nx
 
-from tkinter import colorchooser
 from classes.button import Button
 from classes.vertex import Vertex
-from classes.edge import Edge
-from constants import RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG
+from classes.editmenu import EditMenu
+from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR,
+                       DEFAULT_TEXT_COLOR, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
+
 
 class App:
     def __init__(self):
         self.state = None
         self.selected_vertex = None
-        self.graph = nx.Graph()
         self.vertices = []
         self.edges = []
         self.root = tk.Tk()
         self.root.geometry("1280x720")
         self.root.title("GraphApp")
+        self.root.config(background=DEFAULT_BG_COLOR)
+        self.root.resizable(False, False)
+        self.root.bind("<r>", self.__reset_edge_colors)
+        self.edit_menu = EditMenu(self)
         self.add_vertex_button = Button(self,"add_vertex","AV", 800, 20)
         self.add_vertex_button = Button(self,"move_vertex","MV", 850, 20)
         self.add_edge_button = Button(self,"add_edge", "AE", 900, 20)
@@ -53,14 +57,7 @@ class App:
         start_vertex.neighbours.append(end_vertex)
         end_vertex.neighbours.append(start_vertex)
 
-        edge = Edge(self, DEFAULT_OUTLINE_COLOR, DEFAULT_OUTLINE_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_WIDTH, random.randint(1,10), "none", start_vertex, end_vertex)
-        self.edges.append(edge)
-        start_vertex.edges.append(edge)
-        end_vertex.edges.append(edge)
-        self.graph.add_edge(start_vertex.id, end_vertex.id, weight=edge.weight)
-        self.canvas_id_to_edge[edge.canvas_object_id] = edge
-        self.canvas_id_to_edge[edge.canvas_text] = edge
-        self.canvas_id_to_edge[edge.canvas_text_bg] = edge
+        self.edit_menu.render_add_edge_menu(event, start_vertex, end_vertex)
 
     def visualize_dijkstra(self,event):
         if self.state != "dijkstra":
@@ -70,10 +67,13 @@ class App:
         if result is None:
             return
         
+        self.__reset_edge_colors(event)
+        
         self.selected_vertex = None
         start_vertex, end_vertex = result
-        
-        dijkstra_result = nx.dijkstra_path(self.graph, start_vertex.id, end_vertex.id)
+
+        G = self.build_nx_graph()
+        dijkstra_result = nx.dijkstra_path(G, start_vertex.id, end_vertex.id)
         for edge in self.edges:
             edge_vertices_ids = [vertex.id for vertex in edge.vertices]
             for i in range(len(dijkstra_result)-1):
@@ -93,9 +93,9 @@ class App:
                     return (start_vertex, end_vertex)
         return None
     
-    def start_move_vertex(self, event):
+    def start_move_vertex(self, event) -> None:
         if self.state != "move_vertex":
-            return
+            return 
         
         for vertex in self.vertices:
             if vertex.is_clicked(event.x, event.y):
@@ -120,60 +120,33 @@ class App:
         item_id = self.canvas.find_withtag("current")[0]
         vertex = self.canvas_id_to_vertex[item_id]
 
-        popup = tk.Toplevel(self.root)
-        popup.title("Edit Menu")
-        popup.geometry("200x350+{}+{}".format(event.x_root, event.y_root))
-
-        tk.Label(popup, text="Change Vertex Name:").pack(pady=5)
-        entry = tk.Entry(popup)
-        entry.insert(0, str(vertex.tag))
-        entry.pack(padx=2)
-
-        def change_color(type):
-            color = colorchooser.askcolor()[1]
-            if type == "fill":
-                change_fill_color_label["text"] = color
-                change_fill_color_label["bg"] = color
-            if type == "outline":
-                change_outline_color_label["text"] = color
-                change_outline_color_label["bg"] = color
-            if type == "text":
-                change_text_color_label["text"] = color
-                change_text_color_label["bg"] = color
-
-        change_fill_color = tk.Button(popup, text="Change Fill Color", command=lambda: change_color("fill"))
-        change_fill_color.pack(pady=5)
-
-        change_fill_color_label = tk.Label(popup, text=vertex.fill_color, bg=vertex.fill_color)
-        change_fill_color_label.pack(pady=1)
-
-        change_outline_color = tk.Button(popup, text="Change Outline Color", command=lambda: change_color("outline"))
-        change_outline_color.pack(pady=5)
-
-        change_outline_color_label = tk.Label(popup, text=vertex.outline_color, bg=vertex.outline_color)
-        change_outline_color_label.pack(pady=1)
-
-        change_text_color = tk.Button(popup, text="Change Text Color", command=lambda: change_color("text"))
-        change_text_color.pack(pady=5)
-
-        change_text_color_label = tk.Label(popup, text=vertex.text_color, bg=vertex.text_color)
-        change_text_color_label.pack(pady=1)
-
-        def save():
-            vertex.tag = entry.get()
-            vertex.fill_color, vertex.outline_color, vertex.text_color = change_fill_color_label["text"], change_outline_color_label["text"], change_text_color_label["text"]
-            self.canvas.itemconfig(vertex.canvas_object_id, fill=vertex.fill_color, outline=vertex.outline_color)
-            self.canvas.itemconfig(vertex.canvas_text, fill=vertex.text_color, text=vertex.tag)
-            popup.destroy()
-
-        tk.Button(popup, text="Save", command=save).pack(pady=10)    
+        self.edit_menu.render_vertex_edit_menu(event, vertex)
     
     def edit_edge(self, event):
-        print(self.canvas_id_to_edge)
+        self.state = None
+
+        item_id = self.canvas.find_withtag("current")[0]
+        edge = self.canvas_id_to_edge[item_id]
+
+        self.edit_menu.render_edge_edit_menu(event, edge)
     
     def update_layers(self):
+        """Aktualizácie vrstiev po pridaní hrany."""
         self.canvas.tag_lower("edge")
         self.canvas.tag_raise("vertex")
         self.canvas.tag_raise("edge_label")
+
+    def build_nx_graph(self):
+        G = nx.Graph()
+
+        for edge in self.edges:
+            v1, v2 = edge.vertices
+            G.add_edge(v1.id, v2.id, weight=edge.weight)
+
+        return G
+    
+    def __reset_edge_colors(self, event):
+        for edge in self.edges:
+            self.canvas.itemconfig(edge.canvas_object_id, fill=edge.line_color)
 
         
