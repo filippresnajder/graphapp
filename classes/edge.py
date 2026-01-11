@@ -67,3 +67,28 @@ class Edge:
         y2_new = v2.get_center_y() - dy * RADIUS
 
         return (x2_new, y2_new)
+    
+    def update(self, weight, line, box, text):
+        try:
+            self.weight = int(weight)
+        except ValueError:
+            return "weight-error"
+        self.line_color, self.box_color, self.weight_color = line, box, text
+        self.app.canvas.itemconfig(self.canvas_object_id, fill=self.line_color)
+        self.app.canvas.itemconfig(self.canvas_text_bg, outline=self.box_color)
+        self.app.canvas.itemconfig(self.canvas_text, fill=self.weight_color, text=self.weight)      
+
+    def delete(self):
+        self.app.canvas.delete(self.canvas_object_id)
+        self.app.canvas.delete(self.canvas_text_bg)
+        self.app.canvas.delete(self.canvas_text)
+        self.app.edges.remove(self)
+        for v in self.vertices:
+            if self in v.edges:
+                v.edges.remove(self)
+        for cid in (
+            self.canvas_object_id,
+            self.canvas_text,
+            self.canvas_text_bg
+        ):
+            self.app.canvas_id_to_edge.pop(cid, None)

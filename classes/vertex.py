@@ -27,10 +27,32 @@ class Vertex:
         return (self.coords[1] + self.coords[3]) / 2
     
     def move_to(self, nx, ny):
-        self.coords = (nx-RADIUS, ny-RADIUS, nx+RADIUS, ny+RADIUS)
+        x1, y1, x2, y2 = self.app.canvas.coords(self.canvas_object_id)
+        r = (x2 - x1) / 2
+
+        self.coords = (nx-r, ny-r, nx+r, ny+r)
         self.app.canvas.coords(self.canvas_object_id, self.coords)
         self.app.canvas.coords(self.canvas_text, nx, ny)
 
         for edge in self.edges:
             if self in edge.vertices:
                 edge.update_position()
+    
+    def update(self, tag, fill, outline, text):
+        self.tag = tag[0:20]
+        self.fill_color, self.outline_color, self.text_color = fill, outline, text
+        self.app.canvas.itemconfig(self.canvas_object_id, fill=self.fill_color, outline=self.outline_color)
+        self.app.canvas.itemconfig(self.canvas_text, fill=self.text_color, text=self.tag)
+
+    def delete(self):
+        for edge in self.edges[:]:
+            edge.delete()
+
+        self.app.canvas.delete(self.canvas_object_id)
+        self.app.canvas.delete(self.canvas_text)
+
+        if self in self.app.vertices:
+            self.app.vertices.remove(self)
+
+        for cid in (self.canvas_object_id, self.canvas_text):
+            self.app.canvas_id_to_vertex.pop(cid, None)

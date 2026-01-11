@@ -4,6 +4,7 @@ import networkx as nx
 
 from classes.button import Button
 from classes.vertex import Vertex
+from classes.edge import Edge
 from classes.editmenu import EditMenu
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR,
                        DEFAULT_TEXT_COLOR, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
@@ -12,15 +13,17 @@ from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAUL
 class App:
     def __init__(self):
         self.state = None
+        self.zoom = 1
         self.selected_vertex = None
         self.vertices = []
         self.edges = []
+        self.canvas_id_to_vertex = {}
+        self.canvas_id_to_edge = {}
         self.root = tk.Tk()
         self.root.geometry("1280x720")
         self.root.title("GraphApp")
         self.root.config(background=DEFAULT_BG_COLOR)
         self.root.resizable(False, False)
-        self.root.bind("<r>", self.__reset_edge_colors)
         self.edit_menu = EditMenu(self)
         self.add_vertex_button = Button(self,"add_vertex","AV", 800, 20)
         self.add_vertex_button = Button(self,"move_vertex","MV", 850, 20)
@@ -30,15 +33,20 @@ class App:
         self.canvas.place(x=0,y=80)
         self.canvas.tag_bind(VERTEX_TAG, "<Button-3>", self.edit_vertex)
         self.canvas.tag_bind(EDGE_TAG, "<Button-3>", self.edit_edge)
-        self.canvas_id_to_vertex = {}
-        self.canvas_id_to_edge = {}
+        self.root.bind("<r>", self.__reset_edge_colors)
+        self.root.bind("<Control-d>", self.__remove_all_objects)
+        self.root.bind("<Control-MouseWheel>", self.__zoom)
         self.root.mainloop()
 
     def create_vertex(self, event):
         if self.state != "add_vertex":
             return
         
-        vertex = Vertex(self, (event.x - RADIUS, event.y - RADIUS, event.x + RADIUS, event.y + RADIUS), DEFAULT_FILL_COLOR, DEFAULT_OUTLINE_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_WIDTH)
+        x = self.canvas.canvasx(event.x)
+        y = self.canvas.canvasy(event.y)
+        
+        vertex = Vertex(self, (x - (RADIUS * self.zoom), y - (RADIUS * self.zoom), x + (RADIUS * self.zoom), y + (RADIUS * self.zoom)),
+                        DEFAULT_FILL_COLOR, DEFAULT_OUTLINE_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_WIDTH)
         self.vertices.append(vertex)
         self.canvas_id_to_vertex[vertex.canvas_object_id] = vertex
         self.canvas_id_to_vertex[vertex.canvas_text] = vertex
@@ -47,7 +55,10 @@ class App:
         if self.state != "add_edge":
             return
            
-        result = self.__check_if_clicked_on_vertex(event.x, event.y)
+        x = self.canvas.canvasx(event.x)
+        y = self.canvas.canvasy(event.y)
+
+        result = self.__check_if_clicked_on_vertex(x, y)
         if result is None:
             return
         
@@ -63,7 +74,9 @@ class App:
         if self.state != "dijkstra":
             return
         
-        result = self.__check_if_clicked_on_vertex(event.x, event.y)
+        x = self.canvas.canvasx(event.x)
+        y = self.canvas.canvasy(event.y)
+        result = self.__check_if_clicked_on_vertex(x, y)
         if result is None:
             return
         
@@ -96,18 +109,20 @@ class App:
     def start_move_vertex(self, event) -> None:
         if self.state != "move_vertex":
             return 
-        
+
+        x = self.canvas.canvasx(event.x)
+        y = self.canvas.canvasy(event.y)    
+    
         for vertex in self.vertices:
-            if vertex.is_clicked(event.x, event.y):
+            if vertex.is_clicked(x, y):
                 self.selected_vertex = vertex
                 break
 
     def move_vertex(self, event):
         if self.selected_vertex is None:
             return
-        
-        new_x = event.x
-        new_y = event.y
+        new_x = self.canvas.canvasx(event.x)
+        new_y = self.canvas.canvasy(event.y)
 
         self.selected_vertex.move_to(new_x, new_y)
 
@@ -148,5 +163,40 @@ class App:
     def __reset_edge_colors(self, event):
         for edge in self.edges:
             self.canvas.itemconfig(edge.canvas_object_id, fill=edge.line_color)
+
+    def update_all_edges(self, line, box, text):
+        for edge in self.edges:
+            edge.update(edge.weight, line, box, text)
+
+    def update_all_vertices(self, fill, outline, text):
+        for vertex in self.vertices:
+            vertex.update(str(vertex.tag), fill, outline, text)
+
+    def __remove_all_objects(self, event):
+        self.canvas.delete("all")
+        self.edges.clear()
+        self.vertices.clear()
+        self.canvas_id_to_edge.clear()
+        self.canvas_id_to_vertex.clear()
+        Vertex.identifier = 1
+        Edge.identifier = 1
+
+    def __zoom(self, event):
+        if event.delta > 0:
+            factor = 1.05
+        else:
+            factor = 0.95
+            
+        new_zoom = self.zoom * factor
+
+        if new_zoom > 2 or new_zoom < 0.4:
+            return
+        
+        self.zoom = new_zoom
+        self.canvas.scale("all", self.canvas.winfo_width() / 2, self.canvas.winfo_height() / 2, factor, factor)
+
+        for vertex in self.vertices:
+            vertex.coords = self.canvas.coords(vertex.canvas_object_id)
+
 
         
