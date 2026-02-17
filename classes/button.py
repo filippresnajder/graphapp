@@ -24,3 +24,5 @@ class Button:
             self.app.canvas.bind("<Button-1>", self.app.create_edge)
         elif (self.app.state == "dijkstra"):
             self.app.canvas.bind("<Button-1>", self.app.visualize_dijkstra)
+        elif (self.app.state == "prim"):
+            self.app.canvas.bind("<Button-1>", self.app.visualize_prim)

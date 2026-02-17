@@ -30,6 +30,7 @@ class App:
         self.add_vertex_button = Button(self,"move_vertex","MV", 850, 20)
         self.add_edge_button = Button(self,"add_edge", "AE", 900, 20)
         self.dijkstra = Button(self, "dijkstra", "DA", 950, 20)
+        self.prim = Button(self, "prim", "PA", 1000, 20)
         self.algorithms = Algorithms(self)
         self.canvas = tk.Canvas(self.root, width=1280, height=640, bg="white")
         self.canvas.place(x=0,y=80)
@@ -87,20 +88,54 @@ class App:
         self.selected_vertex = None
         start_vertex, end_vertex = result
 
-        G = self.build_nx_graph()
-        dijkstra_result = nx.dijkstra_path(G, start_vertex.id, end_vertex.id)
+        nx_G = self.build_nx_graph()
+        nx_res = nx.dijkstra_path(nx_G, start_vertex.id, end_vertex.id)
+        own_res = self.algorithms.dijkstra(start_vertex, end_vertex)
 
-        distances, previous = self.algorithms.dijkstra(start_vertex)
-        path = self.algorithms.get_dijkstra_path(start_vertex, end_vertex, previous)
-        own_res = [v.id for v in path]
-
-        print(dijkstra_result == own_res)
+        if nx_res != own_res:
+            # TODO: Handle when test fails
+            return
 
         for edge in self.edges:
             edge_vertices_ids = [vertex.id for vertex in edge.vertices]
-            for i in range(len(dijkstra_result)-1):
-                if dijkstra_result[i] in edge_vertices_ids and dijkstra_result[i+1] in edge_vertices_ids:
+            for i in range(len(own_res)-1):
+                if own_res[i] in edge_vertices_ids and own_res[i+1] in edge_vertices_ids:
                     self.canvas.itemconfig(edge.canvas_object_id, fill="yellow")
+
+        self.state = None
+
+    def visualize_prim(self, event):
+        if self.state != "prim":
+            return
+        
+        x = self.canvas.canvasx(event.x)
+        y = self.canvas.canvasy(event.y)
+        result = self.__check_if_clicked_on_vertex(x, y)
+        if result is None:
+            return
+        
+        self.__reset_edge_colors(event)
+
+        self.selected_vertex = None
+        start_vertex, _ = result
+
+        mst_edges = self.algorithms.prim(start_vertex)
+        nx_mst = nx.minimum_spanning_edges(self.build_nx_graph(), algorithm="prim", data=False)
+        nx_edgelist = list(nx_mst)
+        nx_sorted = sorted(sorted(e) for e in nx_edgelist)
+
+        if (nx_sorted != mst_edges):
+            # TODO: Handle when test fails
+            return
+
+        for edge in self.edges:
+            edge_ids = [v.id for v in edge.vertices]
+            edge_ids_sorted = sorted(edge_ids)
+
+            for mst_edge in mst_edges:
+                if edge_ids_sorted == mst_edge:
+                    self.canvas.itemconfig(edge.canvas_object_id, fill="green")
+                    break
 
         self.state = None
 
