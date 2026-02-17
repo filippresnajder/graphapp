@@ -26,3 +26,5 @@ class Button:
             self.app.canvas.bind("<Button-1>", self.app.visualize_dijkstra)
         elif (self.app.state == "prim"):
             self.app.canvas.bind("<Button-1>", self.app.visualize_prim)
+        elif (self.app.state == "kruskal"):
+            self.app.visualize_kruskal()

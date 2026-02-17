@@ -92,3 +92,46 @@ class Algorithms:
         mst_edges = sorted(mst_edges, key=lambda x: (x[0], x[1]))
 
         return mst_edges
+    
+    def kruskal(self):
+        size = len(self.app.vertices)
+
+        edges = []
+        for edge in self.app.edges:
+            v1, v2 = edge.vertices
+            edges.append((v1.id - 1, v2.id - 1, edge.weight))
+
+        edges.sort(key=lambda x: x[2])
+
+        parent = list(range(size))
+        rank = [0] * size
+
+        def find(i):
+            if parent[i] != i:
+                parent[i] = find(parent[i])
+            return parent[i]
+        
+        def union(x, y):
+            root_x = find(x)
+            root_y = find(y)
+
+            if root_x == root_y:
+                return False
+            
+            if rank[root_x] < rank[root_y]:
+                parent[root_x] = root_y
+            elif rank[root_x] > rank[root_y]:
+                parent[root_y] = root_x
+            else:
+                parent[root_y] = root_x
+                rank[root_x] += 1
+
+            return True
+        
+        mst = []
+        for u,v,w in edges:
+            if union(u,v):
+                mst.append(sorted([u+1, v+1]))
+
+        return sorted(mst)
+

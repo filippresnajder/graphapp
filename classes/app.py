@@ -8,7 +8,7 @@ from classes.edge import Edge
 from classes.editmenu import EditMenu
 from classes.algorithms import Algorithms
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR,
-                       DEFAULT_TEXT_COLOR, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
+                       DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
 
 class App:
@@ -29,8 +29,9 @@ class App:
         self.add_vertex_button = Button(self,"add_vertex","AV", 800, 20)
         self.add_vertex_button = Button(self,"move_vertex","MV", 850, 20)
         self.add_edge_button = Button(self,"add_edge", "AE", 900, 20)
-        self.dijkstra = Button(self, "dijkstra", "DA", 950, 20)
-        self.prim = Button(self, "prim", "PA", 1000, 20)
+        self.dijkstra_button = Button(self, "dijkstra", "DA", 950, 20)
+        self.prim_button = Button(self, "prim", "PA", 1000, 20)
+        self.kruskal_button = Button(self, "kruskal", "KA", 1050, 20)
         self.algorithms = Algorithms(self)
         self.canvas = tk.Canvas(self.root, width=1280, height=640, bg="white")
         self.canvas.place(x=0,y=80)
@@ -100,7 +101,7 @@ class App:
             edge_vertices_ids = [vertex.id for vertex in edge.vertices]
             for i in range(len(own_res)-1):
                 if own_res[i] in edge_vertices_ids and own_res[i+1] in edge_vertices_ids:
-                    self.canvas.itemconfig(edge.canvas_object_id, fill="yellow")
+                    self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
 
         self.state = None
 
@@ -124,9 +125,9 @@ class App:
         nx_edgelist = list(nx_mst)
         nx_sorted = sorted(sorted(e) for e in nx_edgelist)
 
-        if (nx_sorted != mst_edges):
+        if (self.__mst_cost(nx_sorted) != self.__mst_cost(mst_edges)):
             # TODO: Handle when test fails
-            return
+            return   
 
         for edge in self.edges:
             edge_ids = [v.id for v in edge.vertices]
@@ -134,8 +135,30 @@ class App:
 
             for mst_edge in mst_edges:
                 if edge_ids_sorted == mst_edge:
-                    self.canvas.itemconfig(edge.canvas_object_id, fill="green")
+                    self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
                     break
+
+        self.state = None
+
+    def visualize_kruskal(self):
+        if self.state != "kruskal":
+            return
+        
+        self.__reset_edge_colors(None)
+        mst_edges = self.algorithms.kruskal()
+        nx_mst = nx.minimum_spanning_edges(self.build_nx_graph(), algorithm="kruskal", data=False)
+        nx_edgelist = list(nx_mst)
+        nx_sorted = sorted(sorted(e) for e in nx_edgelist)
+
+        if (self.__mst_cost(nx_sorted) != self.__mst_cost(mst_edges)):
+            # TODO: Handle when test fails
+            return    
+
+        mst_set = {frozenset(edge) for edge in mst_edges}
+        for edge in self.edges:
+            v1, v2 = edge.vertices
+            if frozenset([v1.id, v2.id]) in mst_set:
+                self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
 
         self.state = None
 
@@ -241,6 +264,15 @@ class App:
 
         for vertex in self.vertices:
             vertex.coords = self.canvas.coords(vertex.canvas_object_id)
+
+    def __mst_cost(self, edges):
+        cost = 0
+        for u,v in edges:
+            for edge in self.edges:
+                ids = sorted([edge.vertices[0].id, edge.vertices[1].id])
+                if ids == [u,v]:
+                    cost += edge.weight
+        return cost
 
 
         
