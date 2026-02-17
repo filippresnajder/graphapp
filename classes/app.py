@@ -6,6 +6,7 @@ from classes.button import Button
 from classes.vertex import Vertex
 from classes.edge import Edge
 from classes.editmenu import EditMenu
+from classes.algorithms import Algorithms
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR,
                        DEFAULT_TEXT_COLOR, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
@@ -29,6 +30,7 @@ class App:
         self.add_vertex_button = Button(self,"move_vertex","MV", 850, 20)
         self.add_edge_button = Button(self,"add_edge", "AE", 900, 20)
         self.dijkstra = Button(self, "dijkstra", "DA", 950, 20)
+        self.algorithms = Algorithms(self)
         self.canvas = tk.Canvas(self.root, width=1280, height=640, bg="white")
         self.canvas.place(x=0,y=80)
         self.canvas.tag_bind(VERTEX_TAG, "<Button-3>", self.edit_vertex)
@@ -87,6 +89,13 @@ class App:
 
         G = self.build_nx_graph()
         dijkstra_result = nx.dijkstra_path(G, start_vertex.id, end_vertex.id)
+
+        distances, previous = self.algorithms.dijkstra(start_vertex)
+        path = self.algorithms.get_dijkstra_path(start_vertex, end_vertex, previous)
+        own_res = [v.id for v in path]
+
+        print(dijkstra_result == own_res)
+
         for edge in self.edges:
             edge_vertices_ids = [vertex.id for vertex in edge.vertices]
             for i in range(len(dijkstra_result)-1):
