@@ -29,6 +29,6 @@ class Button:
         elif (self.app.state == "kruskal"):
             self.app.visualize_kruskal()
         elif (self.app.state == "dfs"):
-            self.app.visualize_dfs()
+            self.app.canvas.bind("<Button-1>", self.app.visualize_dfs)
         elif (self.app.state == "bfs"):
             self.app.canvas.bind("<Button-1>", self.app.visualize_bfs)

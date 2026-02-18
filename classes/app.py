@@ -202,8 +202,42 @@ class App:
 
         self.state = None
 
-    def visualize_dfs(self):
-        pass
+    def visualize_dfs(self, event):
+        if self.state != "dfs":
+            return
+        
+        x = self.canvas.canvasx(event.x)
+        y = self.canvas.canvasy(event.y)
+
+        start_vertex = None
+
+        for vertex in self.vertices:
+            if vertex.is_clicked(x, y):
+                start_vertex = vertex
+                break
+
+        if start_vertex is None:
+            return
+        
+        self.__reset_vertices_and_edges(event)
+
+        nx_G = self.build_nx_graph()
+        nx_tree = nx.dfs_tree(nx_G, start_vertex.id)
+        nx_edges = {tuple(sorted(edge)) for edge in nx_tree.edges()}
+
+        own_order, own_tree_edges = self.algorithms.dfs(start_vertex)
+        own_edges = {tuple(edge) for edge in own_tree_edges}
+
+        if nx_edges != own_edges:
+            # TODO: Handle when test fails
+            return
+        
+        for index, vertex_id in enumerate(own_order, start=1):
+            for vertex in self.vertices:
+                if vertex.id == vertex_id:
+                    self.canvas.itemconfig(vertex.canvas_text, text=str(index), fill=self.algorithm_fill)
+
+        self.state = None
 
     def __check_if_clicked_on_vertex(self, x, y):
         for vertex in self.vertices:

@@ -156,4 +156,22 @@ class Algorithms:
                     tree_edges.append(sorted([current.id, neigbour.id]))
 
         return traversal_order, tree_edges
+    
+    def dfs(self, start_vertex):
+        visited = set()
+        traversal_order = []
+        tree_edges = []
+
+        def dfs_visit(vertex):
+            visited.add(vertex)
+            traversal_order.append(vertex.id)
+
+            for neighbour in sorted(vertex.neighbours, key=lambda v: v.id):
+                if neighbour not in visited:
+                    tree_edges.append(sorted([vertex.id, neighbour.id]))
+                    dfs_visit(neighbour)
+        
+        dfs_visit(start_vertex)
+
+        return traversal_order, tree_edges
 
