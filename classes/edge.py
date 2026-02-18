@@ -83,9 +83,10 @@ class Edge:
         self.app.canvas.delete(self.canvas_text_bg)
         self.app.canvas.delete(self.canvas_text)
         self.app.edges.remove(self)
+
         for v in self.vertices:
             if self in v.edges:
-                v.edges.remove(self)
+                v.edges.remove(self) 
         for cid in (
             self.canvas_object_id,
             self.canvas_text,

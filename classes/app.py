@@ -36,8 +36,8 @@ class App:
         self.bfs_button = Button(self, "bfs", "BFS", 1150, 20)
         self.algorithms = Algorithms(self)
         self.algorithm_fill = DEFAULT_ALGORITHM_FILL
-        self.canvas = tk.Canvas(self.root, width=1280, height=640, bg="white")
-        self.canvas.place(x=0,y=80)
+        self.canvas = tk.Canvas(self.root, width=1000, height=640, bg="white")
+        self.canvas.place(x=280,y=80)
         self.canvas.tag_bind(VERTEX_TAG, "<Button-3>", self.edit_vertex)
         self.canvas.tag_bind(EDGE_TAG, "<Button-3>", self.edit_edge)
         self.root.bind("<r>", self.__reset_vertices_and_edges)
@@ -72,9 +72,6 @@ class App:
         self.selected_vertex = None
         start_vertex, end_vertex = result
 
-        start_vertex.neighbours.append(end_vertex)
-        end_vertex.neighbours.append(start_vertex)
-
         self.edit_menu.render_add_edge_menu(event, start_vertex, end_vertex)
 
     def visualize_dijkstra(self,event):
@@ -98,6 +95,8 @@ class App:
 
         if nx_res != own_res:
             # TODO: Handle when test fails
+            print(nx_res)
+            print(own_res)
             return
 
         for edge in self.edges:
@@ -192,7 +191,9 @@ class App:
         own_sorted = sorted(own_tree_edges)
 
         if nx_edges != own_sorted:
-            # TODO: Handle when test fails
+            # TODO: Handle when test fails - Fixnut zmeny hran
+            print("nx:", nx_edges)
+            print("own:", own_sorted)
             return
 
         for index, vertex_id in enumerate(own_order, start=1):
@@ -229,7 +230,9 @@ class App:
         own_edges = {tuple(edge) for edge in own_tree_edges}
 
         if nx_edges != own_edges:
-            # TODO: Handle when test fails
+            # TODO: Handle when test fails - Fixnut zmeny hran
+            print("nx:", nx_edges)
+            print("own:", own_edges)
             return
         
         for index, vertex_id in enumerate(own_order, start=1):
@@ -296,11 +299,22 @@ class App:
         self.canvas.tag_raise("edge_label")
 
     def build_nx_graph(self):
-        G = nx.Graph()
+        oriented = False
+
+        for edge in self.edges:
+            if edge.orientation == "yes":
+                oriented = True
+                break
+        
+        G = nx.DiGraph() if oriented else nx.Graph()
 
         for edge in self.edges:
             v1, v2 = edge.vertices
-            G.add_edge(v1.id, v2.id, weight=edge.weight)
+            if edge.orientation == "yes":
+                G.add_edge(v1.id, v2.id, weight=edge.weight)
+            else:
+                G.add_edge(v1.id, v2.id, weight=edge.weight)
+                G.add_edge(v2.id, v1.id, weight=edge.weight)
 
         return G
     
