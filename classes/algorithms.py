@@ -1,4 +1,5 @@
 import heapq
+from collections import deque
 
 class Algorithms:
     def __init__(self, app):
@@ -134,4 +135,25 @@ class Algorithms:
                 mst.append(sorted([u+1, v+1]))
 
         return sorted(mst)
+    
+    def bfs(self, start_vertex):
+        visited = set()
+        queue = deque()
+        traversal_order = []
+        tree_edges = []
+
+        visited.add(start_vertex)
+        queue.append(start_vertex)
+
+        while queue:
+            current = queue.popleft()
+            traversal_order.append(current.id)
+
+            for neigbour in sorted(current.neighbours, key=lambda v: v.id):
+                if neigbour not in visited:
+                    visited.add(neigbour)
+                    queue.append(neigbour)
+                    tree_edges.append(sorted([current.id, neigbour.id]))
+
+        return traversal_order, tree_edges
 

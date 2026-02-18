@@ -32,12 +32,15 @@ class App:
         self.dijkstra_button = Button(self, "dijkstra", "DA", 950, 20)
         self.prim_button = Button(self, "prim", "PA", 1000, 20)
         self.kruskal_button = Button(self, "kruskal", "KA", 1050, 20)
+        self.dfs_button = Button(self, "dfs", "DFS", 1100, 20)
+        self.bfs_button = Button(self, "bfs", "BFS", 1150, 20)
         self.algorithms = Algorithms(self)
+        self.algorithm_fill = DEFAULT_ALGORITHM_FILL
         self.canvas = tk.Canvas(self.root, width=1280, height=640, bg="white")
         self.canvas.place(x=0,y=80)
         self.canvas.tag_bind(VERTEX_TAG, "<Button-3>", self.edit_vertex)
         self.canvas.tag_bind(EDGE_TAG, "<Button-3>", self.edit_edge)
-        self.root.bind("<r>", self.__reset_edge_colors)
+        self.root.bind("<r>", self.__reset_vertices_and_edges)
         self.root.bind("<Control-d>", self.__remove_all_objects)
         self.root.bind("<Control-MouseWheel>", self.__zoom)
         self.root.mainloop()
@@ -84,7 +87,7 @@ class App:
         if result is None:
             return
         
-        self.__reset_edge_colors(event)
+        self.__reset_vertices_and_edges(event)
         
         self.selected_vertex = None
         start_vertex, end_vertex = result
@@ -101,7 +104,7 @@ class App:
             edge_vertices_ids = [vertex.id for vertex in edge.vertices]
             for i in range(len(own_res)-1):
                 if own_res[i] in edge_vertices_ids and own_res[i+1] in edge_vertices_ids:
-                    self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+                    self.canvas.itemconfig(edge.canvas_object_id, fill=self.algorithm_fill)
 
         self.state = None
 
@@ -115,7 +118,7 @@ class App:
         if result is None:
             return
         
-        self.__reset_edge_colors(event)
+        self.__reset_vertices_and_edges(event)
 
         self.selected_vertex = None
         start_vertex, _ = result
@@ -135,7 +138,7 @@ class App:
 
             for mst_edge in mst_edges:
                 if edge_ids_sorted == mst_edge:
-                    self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+                    self.canvas.itemconfig(edge.canvas_object_id, fill=self.algorithm_fill)
                     break
 
         self.state = None
@@ -144,7 +147,7 @@ class App:
         if self.state != "kruskal":
             return
         
-        self.__reset_edge_colors(None)
+        self.__reset_vertices_and_edges(None)
         mst_edges = self.algorithms.kruskal()
         nx_mst = nx.minimum_spanning_edges(self.build_nx_graph(), algorithm="kruskal", data=False)
         nx_edgelist = list(nx_mst)
@@ -158,9 +161,49 @@ class App:
         for edge in self.edges:
             v1, v2 = edge.vertices
             if frozenset([v1.id, v2.id]) in mst_set:
-                self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+                self.canvas.itemconfig(edge.canvas_object_id, fill=self.algorithm_fill)
 
         self.state = None
+
+    def visualize_bfs(self, event):
+        if self.state != "bfs":
+            return
+        
+        x = self.canvas.canvasx(event.x)
+        y = self.canvas.canvasy(event.y)
+
+        start_vertex = None
+
+        for vertex in self.vertices:
+            if vertex.is_clicked(x, y):
+                start_vertex = vertex
+                break
+
+        if start_vertex is None:
+            return
+        
+        self.__reset_vertices_and_edges(event)
+
+        nx_G = self.build_nx_graph()
+        nx_tree = nx.bfs_tree(nx_G, start_vertex.id)
+        nx_edges = sorted(sorted(edge) for edge in nx_tree.edges())
+
+        own_order, own_tree_edges = self.algorithms.bfs(start_vertex)
+        own_sorted = sorted(own_tree_edges)
+
+        if nx_edges != own_sorted:
+            # TODO: Handle when test fails
+            return
+
+        for index, vertex_id in enumerate(own_order, start=1):
+            for vertex in self.vertices:
+                if vertex.id == vertex_id:
+                    self.canvas.itemconfig(vertex.canvas_text, text=str(index), fill=self.algorithm_fill)
+
+        self.state = None
+
+    def visualize_dfs(self):
+        pass
 
     def __check_if_clicked_on_vertex(self, x, y):
         for vertex in self.vertices:
@@ -227,7 +270,10 @@ class App:
 
         return G
     
-    def __reset_edge_colors(self, event):
+    def __reset_vertices_and_edges(self, event):
+        for vertex in self.vertices:
+            self.canvas.itemconfig(vertex.canvas_object_id, fill=vertex.fill_color, outline=vertex.outline_color)
+            self.canvas.itemconfig(vertex.canvas_text, fill=vertex.text_color, text=vertex.tag)
         for edge in self.edges:
             self.canvas.itemconfig(edge.canvas_object_id, fill=edge.line_color)
 
