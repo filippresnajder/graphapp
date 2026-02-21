@@ -171,18 +171,11 @@ class Algorithms:
         tree_edges = []
 
         def dfs_visit(current):
-            visited.add(current)
+            visited.add(current.id)
             traversal_order.append(current.id)
 
-            # Zoradnie hrán podľa ID (čisto kvôli NetworkX testom)
-            edges_sorted = sorted(
-                current.edges,
-                key=lambda e: (
-                    e.vertices[1].id if e.vertices[0] == current else e.vertices[0].id
-                )
-            )
-
-            for edge in edges_sorted:
+            neighbours = []
+            for edge in current.edges:
                 v1, v2 = edge.vertices
 
                 if edge.orientation == "yes":
@@ -192,7 +185,12 @@ class Algorithms:
                 else:
                     neighbour = v2 if v1 == current else v1
 
-                if neighbour not in visited:
+                neighbours.append(neighbour)
+
+            neighbours = sorted(neighbours, key=lambda v: v.id)
+
+            for neighbour in neighbours:
+                if neighbour.id not in visited:
                     tree_edges.append((current.id, neighbour.id))
                     dfs_visit(neighbour)
         

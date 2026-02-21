@@ -188,7 +188,7 @@ class App:
         nx_edges = sorted(sorted(edge) for edge in nx_tree.edges())
 
         own_order, own_tree_edges = self.algorithms.bfs(start_vertex)
-        own_sorted = sorted(own_tree_edges)
+        own_sorted = sorted(sorted(edge) for edge in own_tree_edges)
 
         if nx_edges != own_sorted:
             # TODO: Handle when test fails - Fixnut zmeny hran
@@ -223,11 +223,11 @@ class App:
         self.__reset_vertices_and_edges(event)
 
         nx_G = self.build_nx_graph()
-        nx_tree = nx.dfs_tree(nx_G, start_vertex.id)
+        nx_tree = nx.dfs_tree(nx_G, start_vertex.id, sort_neighbors=sorted)
         nx_edges = {tuple(sorted(edge)) for edge in nx_tree.edges()}
 
         own_order, own_tree_edges = self.algorithms.dfs(start_vertex)
-        own_edges = {tuple(edge) for edge in own_tree_edges}
+        own_edges = {tuple(sorted(edge)) for edge in own_tree_edges}
 
         if nx_edges != own_edges:
             # TODO: Handle when test fails - Fixnut zmeny hran
