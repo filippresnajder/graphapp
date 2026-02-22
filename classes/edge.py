@@ -99,7 +99,6 @@ class Edge:
             return (points[0] + points[2]) / 2, (points[1] + points[3]) / 2
         else:
             x0, y0, cx, cy, x2, y2 = points
-
             t = 0.5
             x = (1 - t)**2 * x0 + 2 * (1 - t) * t * cx + t**2 * x2
             y = (1 - t)**2 * y0 + 2 * (1 - t) * t * cy + t**2 * y2
@@ -139,6 +138,15 @@ class Edge:
         for v in self.vertices:
             if self in v.edges:
                 v.edges.remove(self) 
+
+        for e in self.app.edges:
+            if (set(e.vertices) == set(self.vertices) and
+                e.orientation == self.orientation and
+                e.curve_offset > self.curve_offset 
+            ):
+                e.curve_offset -= 50
+                e.update_position()
+
         for cid in (
             self.canvas_object_id,
             self.canvas_text,
