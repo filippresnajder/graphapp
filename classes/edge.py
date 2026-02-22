@@ -2,6 +2,10 @@ import tkinter as tk
 import math
 from constants import EDGE_TAG, EDGE_LABEL_TAG, BOX_SIZE, RADIUS
 
+# TODO: FIX Overlapping edges after removal when creating new ones
+# TODO: Create Edges going to self
+# TODO: Fix algorithms coloring all edges in multigraphs
+
 class Edge:
     identifier = 1
     def __init__(self, app, fill_color, box_color, text_color, width, weight, orientation, first_vertex, second_vertex):
@@ -15,10 +19,12 @@ class Edge:
         self.weight = weight
         self.orientation = orientation
         self.vertices = [first_vertex, second_vertex]
-        self.canvas_object_id = self.__create_line(orientation, first_vertex, second_vertex)
+        self.curve_offset = self.__calculate_initial_offset()
+        self.canvas_object_id = self.__create_line(orientation)
         self.canvas_text_bg = self.app.canvas.create_rectangle(self.get_center_x()-BOX_SIZE, self.get_center_y()-BOX_SIZE, self.get_center_x()+BOX_SIZE, self.get_center_y()+BOX_SIZE, fill="white", outline=box_color, tags=EDGE_LABEL_TAG)
         self.canvas_text = self.app.canvas.create_text(self.get_center_x(), self.get_center_y(), fill=text_color, text=self.weight, font=("Arial", 12), tags=EDGE_LABEL_TAG)
         self.app.update_layers()
+        self.update_position()
         Edge.identifier += 1
 
     def get_center_x(self):
@@ -35,24 +41,70 @@ class Edge:
 
         if self.orientation == "yes":
             x2, y2 = self.__calculate_position_with_arrow(self.vertices[0], self.vertices[1])
+        
+        points = self.__calculate_curve_points(x1, y1, x2, y2)
+        self.app.canvas.coords(self.canvas_object_id, points)
 
-        self.coords = (x1, y1, x2, y2)
+        weight_label_x, weight_label_y = self.__get_curve_midpoint(points)
+        self.app.canvas.coords(self.canvas_text_bg, weight_label_x - BOX_SIZE, weight_label_y - BOX_SIZE, weight_label_x + BOX_SIZE, weight_label_y + BOX_SIZE)
+        self.app.canvas.coords(self.canvas_text, weight_label_x, weight_label_y)
 
-        self.app.canvas.coords(self.canvas_object_id, self.coords)
+    def __create_line(self, orientation):
+        arrow = tk.LAST if orientation == "yes" else None
+        return self.app.canvas.create_line(
+            0, 0, 0, 0,
+            fill=self.line_color,
+            width=self.width,
+            tags=EDGE_TAG,
+            arrow=arrow,
+            smooth=True
+        )  
 
-        nx = self.get_center_x()
-        ny = self.get_center_y()
+    def __calculate_initial_offset(self):
+        parallel = [e for e in self.app.edges if set(e.vertices) == set(self.vertices)]
 
-        nc = (nx-BOX_SIZE, ny-BOX_SIZE, nx+BOX_SIZE, ny+BOX_SIZE)
-        self.app.canvas.coords(self.canvas_text_bg, nc)
-        self.app.canvas.coords(self.canvas_text, nx, ny)
+        if not parallel:
+            return 0
+        
+        offset_step = 50
+        same_type_count = sum(1 for e in parallel[1:] if e.orientation == self.orientation)
+        
+        return (same_type_count + 1) * offset_step
 
-    def __create_line(self, orientation, v1, v2):
-        if orientation == "yes":
-            x2n, y2n = self.__calculate_position_with_arrow(v1, v2)
-            return self.app.canvas.create_line(v1.get_center_x(), v1.get_center_y(), x2n, y2n, fill=self.line_color, width=self.width, tags=EDGE_TAG, arrow=tk.LAST)
+    def __calculate_curve_points(self, x1, y1, x2, y2):
+        if self.curve_offset == 0:
+            return (x1, y1, x2, y2)
 
-        return self.app.canvas.create_line(v1.get_center_x(), v1.get_center_y(), v2.get_center_x(), v2.get_center_y(), fill=self.line_color, width=self.width, tags=EDGE_TAG)
+        dx = x2 - x1
+        dy = y2 - y1
+        length = math.hypot(dx, dy)
+        if length == 0:
+            return (x1, y1, x2, y2)
+
+        nx = -dy / length
+        ny = dx / length
+
+        offset = self.curve_offset
+        if self.orientation == "yes":  
+            cx = (x1 + x2) / 2 + nx * offset
+            cy = (y1 + y2) / 2 + ny * offset
+        else:
+            cx = (x1 + x2) / 2 - nx * offset
+            cy = (y1 + y2) / 2 - ny * offset
+
+        return (x1, y1, cx, cy, x2, y2)
+
+    def __get_curve_midpoint(self, points):
+        if len(points) == 4:
+            return (points[0] + points[2]) / 2, (points[1] + points[3]) / 2
+        else:
+            x0, y0, cx, cy, x2, y2 = points
+
+            t = 0.5
+            x = (1 - t)**2 * x0 + 2 * (1 - t) * t * cx + t**2 * x2
+            y = (1 - t)**2 * y0 + 2 * (1 - t) * t * cy + t**2 * y2
+
+            return x, y
     
     def __calculate_position_with_arrow(self, v1, v2):
         dx = v2.get_center_x() - v1.get_center_x()
@@ -67,7 +119,7 @@ class Edge:
         y2_new = v2.get_center_y() - dy * RADIUS
 
         return (x2_new, y2_new)
-    
+
     def update(self, weight, line, box, text):
         try:
             self.weight = int(weight)
