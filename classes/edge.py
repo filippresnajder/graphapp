@@ -2,7 +2,6 @@ import tkinter as tk
 import math
 from constants import EDGE_TAG, EDGE_LABEL_TAG, BOX_SIZE, RADIUS
 
-# TODO: FIX Overlapping edges after removal when creating new ones
 # TODO: Create Edges going to self
 # TODO: Fix algorithms coloring all edges in multigraphs
 
@@ -66,10 +65,10 @@ class Edge:
         if not parallel:
             return 0
         
+        same_first_vertex_count = sum(1 for e in parallel[1:] if e.vertices[0].id == self.vertices[0].id)
         offset_step = 50
-        same_type_count = sum(1 for e in parallel[1:] if e.orientation == self.orientation)
         
-        return (same_type_count + 1) * offset_step
+        return (same_first_vertex_count + 1) * offset_step
 
     def __calculate_curve_points(self, x1, y1, x2, y2):
         if self.curve_offset == 0:
@@ -85,12 +84,8 @@ class Edge:
         ny = dx / length
 
         offset = self.curve_offset
-        if self.orientation == "yes":  
-            cx = (x1 + x2) / 2 + nx * offset
-            cy = (y1 + y2) / 2 + ny * offset
-        else:
-            cx = (x1 + x2) / 2 - nx * offset
-            cy = (y1 + y2) / 2 - ny * offset
+        cx = (x1 + x2) / 2 + nx * offset
+        cy = (y1 + y2) / 2 + ny * offset
 
         return (x1, y1, cx, cy, x2, y2)
 
@@ -140,8 +135,7 @@ class Edge:
                 v.edges.remove(self) 
 
         for e in self.app.edges:
-            if (set(e.vertices) == set(self.vertices) and
-                e.orientation == self.orientation and
+            if (e.vertices == self.vertices and
                 e.curve_offset > self.curve_offset 
             ):
                 e.curve_offset -= 50
