@@ -14,6 +14,7 @@ class Algorithms:
         distances[start_vertex] = 0
 
         pq = [(0, start_vertex.id, start_vertex)]
+        edge_ids = []
 
         while pq:
             current_dist, _, current = heapq.heappop(pq)
@@ -40,6 +41,8 @@ class Algorithms:
                     distances[neighbour] = new_dist
                     previous[neighbour] = current
                     heapq.heappush(pq, (new_dist, neighbour.id, neighbour))
+                    edge_ids.append(edge.id)
+
 
         path = []
         current = end_vertex
@@ -51,7 +54,7 @@ class Algorithms:
             path.insert(0, current.id)
             current = previous.get(current)
 
-        return path
+        return path, edge_ids
     
     def prim(self, start_vertex):
         if self.__is_graph_oriented():

@@ -91,7 +91,7 @@ class App:
 
         nx_G = self.build_nx_graph()
         nx_res = nx.dijkstra_path(nx_G, start_vertex.id, end_vertex.id)
-        own_res = self.algorithms.dijkstra(start_vertex, end_vertex)
+        own_res, edge_ids = self.algorithms.dijkstra(start_vertex, end_vertex)
 
         if nx_res != own_res:
             # TODO: Handle when test fails
@@ -100,10 +100,8 @@ class App:
             return
 
         for edge in self.edges:
-            edge_vertices_ids = [vertex.id for vertex in edge.vertices]
-            for i in range(len(own_res)-1):
-                if own_res[i] in edge_vertices_ids and own_res[i+1] in edge_vertices_ids:
-                    self.canvas.itemconfig(edge.canvas_object_id, fill=self.algorithm_fill)
+            if edge.id in edge_ids and (edge.vertices[0].id in own_res and edge.vertices[1].id in own_res):
+                self.canvas.itemconfig(edge.canvas_object_id, fill=self.algorithm_fill)
 
         self.state = None
 

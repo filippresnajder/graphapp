@@ -2,8 +2,8 @@ import tkinter as tk
 import math
 from constants import EDGE_TAG, EDGE_LABEL_TAG, BOX_SIZE, RADIUS
 
-# TODO: Create Edges going to self
 # TODO: Fix algorithms coloring all edges in multigraphs
+# TODO: Check arrow and curved edges deformation on zooms
 
 class Edge:
     identifier = 1
@@ -21,7 +21,7 @@ class Edge:
         self.curve_offset = self.__calculate_initial_offset()
         self.canvas_object_id = self.__create_line(orientation)
         self.canvas_text_bg = self.app.canvas.create_rectangle(self.get_center_x()-BOX_SIZE, self.get_center_y()-BOX_SIZE, self.get_center_x()+BOX_SIZE, self.get_center_y()+BOX_SIZE, fill="white", outline=box_color, tags=EDGE_LABEL_TAG)
-        self.canvas_text = self.app.canvas.create_text(self.get_center_x(), self.get_center_y(), fill=text_color, text=self.weight, font=("Arial", 12), tags=EDGE_LABEL_TAG)
+        self.canvas_text = self.app.canvas.create_text(self.get_center_x(), self.get_center_y(), fill=text_color, text=self.weight, font=("Arial", 8), tags=EDGE_LABEL_TAG)
         self.app.update_layers()
         self.update_position()
         Edge.identifier += 1
@@ -41,7 +41,7 @@ class Edge:
         if self.orientation == "yes":
             x2, y2 = self.__calculate_position_with_arrow(self.vertices[0], self.vertices[1])
         
-        points = self.__calculate_curve_points(x1, y1, x2, y2)
+        points = self.__create_self_loop() if self.__is_self_loop() else self.__calculate_curve_points(x1, y1, x2, y2) 
         self.app.canvas.coords(self.canvas_object_id, points)
 
         weight_label_x, weight_label_y = self.__get_curve_midpoint(points)
@@ -49,7 +49,7 @@ class Edge:
         self.app.canvas.coords(self.canvas_text, weight_label_x, weight_label_y)
 
     def __create_line(self, orientation):
-        arrow = tk.LAST if orientation == "yes" else None
+        arrow = tk.LAST if orientation == "yes" or self.vertices[0] != self.vertices[1] else None
         return self.app.canvas.create_line(
             0, 0, 0, 0,
             fill=self.line_color,
@@ -57,7 +57,22 @@ class Edge:
             tags=EDGE_TAG,
             arrow=arrow,
             smooth=True
-        )  
+        )
+
+    def __is_self_loop(self):
+        return self.vertices[0] == self.vertices[1]
+    
+    def __create_self_loop(self):
+        cx, cy = self.vertices[0].get_center_x(), self.vertices[0].get_center_y()
+        offset = self.curve_offset
+        loop_radius = (RADIUS * 2) + offset
+
+        start_x, start_y = cx, cy - RADIUS
+        end_x, end_y = cx, cy + RADIUS
+
+        control_x = cx - loop_radius * 2
+        control_y = cy + loop_radius 
+        return (start_x, start_y, control_x, control_y, end_x, end_y)
 
     def __calculate_initial_offset(self):
         parallel = [e for e in self.app.edges if set(e.vertices) == set(self.vertices)]
@@ -66,7 +81,7 @@ class Edge:
             return 0
         
         same_first_vertex_count = sum(1 for e in parallel[1:] if e.vertices[0].id == self.vertices[0].id)
-        offset_step = 50
+        offset_step = 50 if self.vertices[0] != self.vertices[1] else 25
         
         return (same_first_vertex_count + 1) * offset_step
 
@@ -97,7 +112,6 @@ class Edge:
             t = 0.5
             x = (1 - t)**2 * x0 + 2 * (1 - t) * t * cx + t**2 * x2
             y = (1 - t)**2 * y0 + 2 * (1 - t) * t * cy + t**2 * y2
-
             return x, y
     
     def __calculate_position_with_arrow(self, v1, v2):
@@ -125,12 +139,15 @@ class Edge:
         self.app.canvas.itemconfig(self.canvas_text, fill=self.weight_color, text=self.weight)      
 
     def delete(self):
+        if self not in self.app.edges:
+            return
+
         self.app.canvas.delete(self.canvas_object_id)
         self.app.canvas.delete(self.canvas_text_bg)
         self.app.canvas.delete(self.canvas_text)
         self.app.edges.remove(self)
 
-        for v in self.vertices:
+        for v in set(self.vertices):
             if self in v.edges:
                 v.edges.remove(self) 
 
@@ -138,7 +155,7 @@ class Edge:
             if (e.vertices == self.vertices and
                 e.curve_offset > self.curve_offset 
             ):
-                e.curve_offset -= 50
+                e.curve_offset -= 50 if e.vertices[0] != e.vertices[1] else 25
                 e.update_position()
 
         for cid in (
