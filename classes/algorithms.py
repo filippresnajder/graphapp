@@ -14,7 +14,6 @@ class Algorithms:
         distances[start_vertex] = 0
 
         pq = [(0, start_vertex.id, start_vertex)]
-        edge_ids = []
 
         while pq:
             current_dist, _, current = heapq.heappop(pq)
@@ -39,20 +38,24 @@ class Algorithms:
 
                 if new_dist < distances[neighbour]:
                     distances[neighbour] = new_dist
-                    previous[neighbour] = current
+                    previous[neighbour] = (current, edge)
                     heapq.heappush(pq, (new_dist, neighbour.id, neighbour))
-                    edge_ids.append(edge.id)
 
 
-        path = []
-        current = end_vertex
-
-        if current not in previous and current != start_vertex:
+        if end_vertex not in previous and end_vertex != start_vertex:
             return None
         
-        while current:
+        path = []
+        edge_ids = []
+        current = end_vertex
+
+        while current != start_vertex:
             path.insert(0, current.id)
-            current = previous.get(current)
+            prev_vertex, prev_edge = previous[current]
+            edge_ids.insert(0, prev_edge.id)
+            current = prev_vertex
+
+        path.insert(0, start_vertex.id)
 
         return path, edge_ids
     
@@ -71,24 +74,24 @@ class Algorithms:
         for edge in start_vertex.edges:
             v1, v2 = edge.vertices
             neighbour = v2 if v1 == start_vertex else v1
-            heapq.heappush(pq, (edge.weight, counter, start_vertex, neighbour))
+            heapq.heappush(pq, (edge.weight, counter, start_vertex, neighbour, edge))
             counter += 1
 
         while pq:
-            weight, _, u, v = heapq.heappop(pq)
+            weight, _, u, v, edge = heapq.heappop(pq)
 
             if v in visited:
                 continue
 
             visited.add(v)
-            mst_edges.append(sorted([u.id, v.id]))
+            mst_edges.append(edge.id)
 
             for edge in v.edges:
                 v1, v2 = edge.vertices
                 neighbour = v2 if v1 == v else v1
 
                 if neighbour not in visited:
-                    heapq.heappush(pq, (edge.weight, counter, v, neighbour))
+                    heapq.heappush(pq, (edge.weight, counter, v, neighbour, edge))
                     counter += 1
 
         return sorted(mst_edges)
@@ -102,9 +105,9 @@ class Algorithms:
         edges = []
         for edge in self.app.edges:
             v1, v2 = edge.vertices
-            edges.append((v1.id - 1, v2.id - 1, edge.weight))
+            edges.append((edge.weight, edge.id, v1.id - 1, v2.id - 1))
 
-        edges.sort(key=lambda x: x[2])
+        edges.sort()
 
         parent = list(range(size))
         rank = [0] * size
@@ -132,11 +135,11 @@ class Algorithms:
             return True
         
         mst = []
-        for u,v,w in edges:
+        for weight, edge_id, u, v in edges:
             if union(u,v):
-                mst.append(sorted([u+1, v+1]))
+                mst.append(edge_id)
 
-        return sorted(mst)
+        return mst
     
     def bfs(self, start_vertex):
         visited = set()

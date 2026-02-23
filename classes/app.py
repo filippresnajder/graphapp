@@ -100,7 +100,7 @@ class App:
             return
 
         for edge in self.edges:
-            if edge.id in edge_ids and (edge.vertices[0].id in own_res and edge.vertices[1].id in own_res):
+            if edge.id in edge_ids:
                 self.canvas.itemconfig(edge.canvas_object_id, fill=self.algorithm_fill)
 
         self.state = None
@@ -121,22 +121,17 @@ class App:
         start_vertex, _ = result
 
         mst_edges = self.algorithms.prim(start_vertex)
-        nx_mst = nx.minimum_spanning_edges(self.build_nx_graph(), algorithm="prim", data=False)
-        nx_edgelist = list(nx_mst)
-        nx_sorted = sorted(sorted(e) for e in nx_edgelist)
+        nx_G = self.build_nx_graph()
+        nx_mst = nx.minimum_spanning_tree(nx_G, algorithm="prim")
+        nx_cost = nx_mst.size(weight="weight")
 
-        if (self.__mst_cost(nx_sorted) != self.__mst_cost(mst_edges)):
-            # TODO: Handle when test fails
+        if (nx_cost != self.__mst_cost_self(mst_edges)):
+            # TODO: Failed test
             return   
 
         for edge in self.edges:
-            edge_ids = [v.id for v in edge.vertices]
-            edge_ids_sorted = sorted(edge_ids)
-
-            for mst_edge in mst_edges:
-                if edge_ids_sorted == mst_edge:
-                    self.canvas.itemconfig(edge.canvas_object_id, fill=self.algorithm_fill)
-                    break
+            if edge.id in mst_edges:
+                self.canvas.itemconfig(edge.canvas_object_id, fill=self.algorithm_fill)
 
         self.state = None
 
@@ -146,19 +141,17 @@ class App:
         
         self.__reset_vertices_and_edges(None)
         mst_edges = self.algorithms.kruskal()
-        nx_mst = nx.minimum_spanning_edges(self.build_nx_graph(), algorithm="kruskal", data=False)
-        nx_edgelist = list(nx_mst)
-        nx_sorted = sorted(sorted(e) for e in nx_edgelist)
+        nx_G = self.build_nx_graph()
+        nx_mst = nx.minimum_spanning_tree(nx_G, algorithm="prim")
+        nx_cost = nx_mst.size(weight="weight")
 
-        if (self.__mst_cost(nx_sorted) != self.__mst_cost(mst_edges)):
-            # TODO: Handle when test fails
+        if (nx_cost != self.__mst_cost_self(mst_edges)):
+            # TODO: Failed test
             return    
 
-        mst_set = {frozenset(edge) for edge in mst_edges}
         for edge in self.edges:
-            v1, v2 = edge.vertices
-            if frozenset([v1.id, v2.id]) in mst_set:
-                self.canvas.itemconfig(edge.canvas_object_id, fill=self.algorithm_fill)
+            if edge.id in mst_edges:
+                self.canvas.itemconfig(edge.canvas_object_id, fill=self.algorithm_fill)          
 
         self.state = None
 
@@ -304,15 +297,20 @@ class App:
                 oriented = True
                 break
         
-        G = nx.DiGraph() if oriented else nx.Graph()
+        G = nx.MultiDiGraph() if oriented else nx.MultiGraph()
 
         for edge in self.edges:
-            v1, v2 = edge.vertices
-            if edge.orientation == "yes":
-                G.add_edge(v1.id, v2.id, weight=edge.weight)
+            if oriented:
+                if edge.orientation == "yes":
+                    v1, v2 = edge.vertices
+                    G.add_edge(v1.id, v2.id, weight=edge.weight)
+                else:
+                    v1, v2 = edge.vertices
+                    G.add_edge(v1.id, v2.id, weight=edge.weight)
+                    G.add_edge(v2.id, v1.id, weight=edge.weight)
             else:
+                v1, v2 = edge.vertices
                 G.add_edge(v1.id, v2.id, weight=edge.weight)
-                G.add_edge(v2.id, v1.id, weight=edge.weight)
 
         return G
     
@@ -356,14 +354,12 @@ class App:
 
         for vertex in self.vertices:
             vertex.coords = self.canvas.coords(vertex.canvas_object_id)
-
-    def __mst_cost(self, edges):
+    
+    def __mst_cost_self(self, edges):
         cost = 0
-        for u,v in edges:
-            for edge in self.edges:
-                ids = sorted([edge.vertices[0].id, edge.vertices[1].id])
-                if ids == [u,v]:
-                    cost += edge.weight
+        for edge in self.edges:
+            if edge.id in edges:
+                cost += edge.weight
         return cost
 
 
