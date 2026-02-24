@@ -6,17 +6,30 @@ class Algorithms:
         self.app = app
     
     def dijkstra(self, start_vertex, end_vertex):
+        self.app.infobox.clear()
+
         if self.__contains_negative_weight():
-            return False #TODO: Vypíš správu keď graf obsahuje zápornú hranu
+            self.app.infobox.log("Chyba: Dijkstrov algoritmus nie je možné spusiť v grafe so zápornými hranami")
+            return False
+        
+        self.app.infobox.log(f"Spúštam Dijkstrov algoritmus od vrcholu {start_vertex.tag}")
+        self.app.infobox.log("Inicializujem vzdialenosti pre vrcholy na nekonečno")
 
         distances = {v: float("inf") for v in self.app.vertices}
         previous = {}
+        edges_visited = []
         distances[start_vertex] = 0
+        self.app.infobox.log(f"Pre vrchol {start_vertex.tag} nastavujem vzdialenosť 0")
 
         pq = [(0, start_vertex.id, start_vertex)]
 
         while pq:
             current_dist, _, current = heapq.heappop(pq)
+
+            if (current != end_vertex):
+                self.app.infobox.log(f"Vyberám vrchol {current.tag} s aktuálnou vzdialenosťou {current_dist}")
+            else:
+                self.app.infobox.log("Navštívil som konečný vrchol začínam rekonštrukciu cesty")
 
             if current == end_vertex:
                 break
@@ -34,12 +47,21 @@ class Algorithms:
                 else:
                     neighbour = v2 if v1 == current else v1
 
+                if edge not in edges_visited:
+                    self.app.infobox.log(f"Skúmam hranu {current.tag} -> {neighbour.tag} (váha {edge.weight})")
+
                 new_dist = current_dist + edge.weight
 
                 if new_dist < distances[neighbour]:
                     distances[neighbour] = new_dist
                     previous[neighbour] = (current, edge)
                     heapq.heappush(pq, (new_dist, neighbour.id, neighbour))
+                    self.app.infobox.log(f"Našla sa kratšia vzdialenosť - aktualizujem vzdialenosť do vrcholu {neighbour.tag} na hodnotu {new_dist}")
+                else:
+                    if edge not in edges_visited:
+                        self.app.infobox.log(f"Neaktualizujem vrchol {neighbour.tag} - aktuálna vzdialenosť je kratšia.")
+                
+                edges_visited.append(edge)
 
 
         if end_vertex not in previous and end_vertex != start_vertex:
@@ -57,7 +79,7 @@ class Algorithms:
 
         path.insert(0, start_vertex.id)
 
-        return path, edge_ids
+        return (path, edge_ids)
     
     def prim(self, start_vertex):
         if self.__is_graph_oriented():

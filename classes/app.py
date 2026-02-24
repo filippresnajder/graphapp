@@ -7,8 +7,12 @@ from classes.vertex import Vertex
 from classes.edge import Edge
 from classes.editmenu import EditMenu
 from classes.algorithms import Algorithms
+from classes.infobox import Infobox
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR,
                        DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
+
+# TODO: Implement Infobox
+# TODO: Implement step-by-step algorithm visualization
 
 
 class App:
@@ -34,9 +38,10 @@ class App:
         self.kruskal_button = Button(self, "kruskal", "KA", 1050, 20)
         self.dfs_button = Button(self, "dfs", "DFS", 1100, 20)
         self.bfs_button = Button(self, "bfs", "BFS", 1150, 20)
+        self.infobox = Infobox(self)
         self.algorithms = Algorithms(self)
         self.algorithm_fill = DEFAULT_ALGORITHM_FILL
-        self.canvas = tk.Canvas(self.root, width=980, height=580, bg="white")
+        self.canvas = tk.Canvas(self.root, width=980, height=610, bg="white")
         self.canvas.place(x=280,y=80)
         self.canvas.tag_bind(VERTEX_TAG, "<Button-3>", self.edit_vertex)
         self.canvas.tag_bind(EDGE_TAG, "<Button-3>", self.edit_edge)
@@ -90,14 +95,31 @@ class App:
         start_vertex, end_vertex = result
 
         nx_G = self.build_nx_graph()
-        nx_res = nx.dijkstra_path(nx_G, start_vertex.id, end_vertex.id)
-        own_res, edge_ids = self.algorithms.dijkstra(start_vertex, end_vertex)
+        
+        own_result = self.algorithms.dijkstra(start_vertex, end_vertex)
+        if not own_result:
+            return
+
+        own_res, edge_ids = own_result
+
+        try:
+            nx_res = nx.dijkstra_path(nx_G, start_vertex.id, end_vertex.id)
+        except Exception as e:
+            self.infobox.clear()
+            self.infobox.log(f"Chyba: {str(e)}")
+            return
+
+        self.infobox.log("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
 
         if nx_res != own_res:
-            # TODO: Handle when test fails
-            print(nx_res)
-            print(own_res)
+            self.infobox.clear()
+            self.infobox.log("Zlyhanie testu, výstupné údaje nesedia")
+            self.infobox.log(f"NetworkX výsledok: {nx_res}")
+            self.infobox.log(f"Vlastný výsledok: {own_res}")
             return
+        
+        self.infobox.log(f"Výsledky sedia - cesta {own_res}")
+        self.infobox.log("Ukončujem algoritmus")
 
         for edge in self.edges:
             if edge.id in edge_ids:
