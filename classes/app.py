@@ -36,7 +36,7 @@ class App:
         self.bfs_button = Button(self, "bfs", "BFS", 1150, 20)
         self.algorithms = Algorithms(self)
         self.algorithm_fill = DEFAULT_ALGORITHM_FILL
-        self.canvas = tk.Canvas(self.root, width=1000, height=640, bg="white")
+        self.canvas = tk.Canvas(self.root, width=980, height=580, bg="white")
         self.canvas.place(x=280,y=80)
         self.canvas.tag_bind(VERTEX_TAG, "<Button-3>", self.edit_vertex)
         self.canvas.tag_bind(EDGE_TAG, "<Button-3>", self.edit_edge)

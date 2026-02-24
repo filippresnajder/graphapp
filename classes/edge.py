@@ -2,8 +2,7 @@ import tkinter as tk
 import math
 from constants import EDGE_TAG, EDGE_LABEL_TAG, BOX_SIZE, RADIUS
 
-# TODO: Fix algorithms coloring all edges in multigraphs
-# TODO: Check arrow and curved edges deformation on zooms
+# TODO: Check self loops curves deformations on zoom
 
 class Edge:
     identifier = 1
