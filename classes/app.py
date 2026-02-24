@@ -354,6 +354,9 @@ class App:
 
         for vertex in self.vertices:
             vertex.coords = self.canvas.coords(vertex.canvas_object_id)
+
+        for edge in self.edges:
+            edge.update_position()
     
     def __mst_cost_self(self, edges):
         cost = 0

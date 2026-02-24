@@ -2,8 +2,6 @@ import tkinter as tk
 import math
 from constants import EDGE_TAG, EDGE_LABEL_TAG, BOX_SIZE, RADIUS
 
-# TODO: Check self loops curves deformations on zoom
-
 class Edge:
     identifier = 1
     def __init__(self, app, fill_color, box_color, text_color, width, weight, orientation, first_vertex, second_vertex):
@@ -64,10 +62,10 @@ class Edge:
     def __create_self_loop(self):
         cx, cy = self.vertices[0].get_center_x(), self.vertices[0].get_center_y()
         offset = self.curve_offset
-        loop_radius = (RADIUS * 2) + offset
+        loop_radius = (RADIUS * self.app.zoom * 2) + offset
 
-        start_x, start_y = cx, cy - RADIUS
-        end_x, end_y = cx, cy + RADIUS
+        start_x, start_y = cx, cy - (RADIUS * self.app.zoom)
+        end_x, end_y = cx, cy + (RADIUS * self.app.zoom)
 
         control_x = cx - loop_radius * 2
         control_y = cy + loop_radius 
