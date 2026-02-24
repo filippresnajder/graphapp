@@ -11,6 +11,7 @@ from classes.infobox import Infobox
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR,
                        DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
+# TODO: Fix for Dijkstra, Prim, Kruskal, to show Vertex tags in infobox, not IDS
 # TODO: Implement step-by-step algorithm visualization for DFS and BFS
 # TODO: Implement buttons to show step by step coloring for all algos
 

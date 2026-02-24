@@ -29,7 +29,7 @@ class Algorithms:
             if (current != end_vertex):
                 self.app.infobox.log(f"Vyberám vrchol {current.tag} s aktuálnou vzdialenosťou {current_dist}")
             else:
-                self.app.infobox.log("Navštívil som konečný vrchol začínam rekonštrukciu cesty")
+                self.app.infobox.log("Navštívil som konečný vrchol, začínam rekonštrukciu cesty")
 
             if current == end_vertex:
                 break
