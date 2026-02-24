@@ -12,6 +12,7 @@ from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAUL
                        DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
 # TODO: Implement step-by-step algorithm visualization for DFS and BFS
+# TODO: Implement buttons to show step by step coloring for all algos
 
 
 class App:
