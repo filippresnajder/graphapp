@@ -82,12 +82,17 @@ class Algorithms:
         return (path, edge_ids)
     
     def prim(self, start_vertex):
+        self.app.infobox.clear()
+
         if self.__is_graph_oriented():
-            return False #TODO: Vypíš správu keď je graf orientovaný
+            self.app.infobox.log("Chyba: Primov algoritmus nefunguje na orientované grafy")
+            return False
 
         visited = set()
         mst_edges = []
         pq = []
+        visited_edges = []
+        self.app.infobox.log(f"Spúštam Primov algoritmus od vrcholu {start_vertex.tag}")
 
         visited.add(start_vertex)
 
@@ -105,8 +110,12 @@ class Algorithms:
             if v in visited:
                 continue
 
+            self.app.infobox.log(f"Najlacnejšia cesta bez vzniku cyklu do vrcholu {v.tag} vedie z vrcholu {u.tag} pomocou hrany s hodnotou {weight}")
+
             visited.add(v)
             mst_edges.append(edge.id)
+            self.app.infobox.log(f"Vrchol {v.tag} prídavam do navštívených a hranu ({u.tag} - {v.tag}, váha: {weight}) pridávam do MST")
+            visited_edges.append(edge)
 
             for edge in v.edges:
                 v1, v2 = edge.vertices
@@ -116,20 +125,24 @@ class Algorithms:
                     heapq.heappush(pq, (edge.weight, counter, v, neighbour, edge))
                     counter += 1
 
-        return sorted(mst_edges)
+        return mst_edges
     
     def kruskal(self):
+        self.app.infobox.clear()
+
         if self.__is_graph_oriented():
-            return False #TODO: Vypíš správu keď je graf orientovaný
+            self.app.infobox.log("Chyba: Kruskalov algoritmus nefunguje na orientované grafy")
+            return False
         
         size = len(self.app.vertices)
 
         edges = []
         for edge in self.app.edges:
             v1, v2 = edge.vertices
-            edges.append((edge.weight, edge.id, v1.id - 1, v2.id - 1))
+            edges.append((edge.weight, edge.id, v1.id - 1, v2.id - 1, v1.tag, v2.tag))
 
         edges.sort()
+        self.app.infobox.log("Spúštam Kruskalov algoritmus a zoraďujem si hrany od najmenšej po najväčšiu")
 
         parent = list(range(size))
         rank = [0] * size
@@ -139,11 +152,13 @@ class Algorithms:
                 parent[i] = find(parent[i])
             return parent[i]
         
-        def union(x, y):
+        def union(x, y, x_tag, y_tag, weight):
             root_x = find(x)
             root_y = find(y)
+            self.app.infobox.log(f"Kontrola hrany medzi vrcholmi {x_tag} - {y_tag} s váhou {weight}")
 
             if root_x == root_y:
+                self.app.infobox.log("Vznikol cyklus, preskakujem")
                 return False
             
             if rank[root_x] < rank[root_y]:
@@ -154,11 +169,12 @@ class Algorithms:
                 parent[root_y] = root_x
                 rank[root_x] += 1
 
+            self.app.infobox.log(f"Bola vybraná hrana {x_tag} - {y_tag} s váhou {weight}")
             return True
         
         mst = []
-        for weight, edge_id, u, v in edges:
-            if union(u,v):
+        for weight, edge_id, u, v, u_tag, v_tag in edges:
+            if union(u,v, u_tag, v_tag, weight):
                 mst.append(edge_id)
 
         return mst

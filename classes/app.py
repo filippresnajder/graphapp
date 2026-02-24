@@ -11,8 +11,7 @@ from classes.infobox import Infobox
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR,
                        DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
-# TODO: Implement Infobox
-# TODO: Implement step-by-step algorithm visualization
+# TODO: Implement step-by-step algorithm visualization for DFS and BFS
 
 
 class App:
@@ -95,7 +94,7 @@ class App:
         start_vertex, end_vertex = result
 
         nx_G = self.build_nx_graph()
-        
+
         own_result = self.algorithms.dijkstra(start_vertex, end_vertex)
         if not own_result:
             return
@@ -133,23 +132,41 @@ class App:
         
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasy(event.y)
-        result = self.__check_if_clicked_on_vertex(x, y)
-        if result is None:
+        start_vertex = None
+
+        for vertex in self.vertices:
+            if vertex.is_clicked(x, y):
+                start_vertex = vertex
+                break
+
+        if start_vertex is None:
             return
         
         self.__reset_vertices_and_edges(event)
 
-        self.selected_vertex = None
-        start_vertex, _ = result
-
         mst_edges = self.algorithms.prim(start_vertex)
-        nx_G = self.build_nx_graph()
-        nx_mst = nx.minimum_spanning_tree(nx_G, algorithm="prim")
-        nx_cost = nx_mst.size(weight="weight")
+        if not mst_edges:
+            return
 
-        if (nx_cost != self.__mst_cost_self(mst_edges)):
-            # TODO: Failed test
-            return   
+        nx_G = self.build_nx_graph()
+        try:
+            nx_mst = nx.minimum_spanning_tree(nx_G, algorithm="prim")
+        except Exception as e:
+            self.infobox.clear()
+            self.infobox.log(f"Chyba: {str(e)}")
+            return
+        nx_cost = nx_mst.size(weight="weight")
+        own_cost = self.__mst_cost_self(mst_edges)
+
+        self.infobox.log("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
+        if (nx_cost != own_cost):
+            self.infobox.log("Chyba: Test medzi vlastným algoritmom a NetworkX algoritmom zlyhal")
+            self.infobox.log(f"Váha NetworkX: {nx_cost}")
+            self.infobox.log(f"Váha Vlastného algoritmu: {own_cost}")
+            return
+
+        self.infobox.log(f"Výsledky sedia - kostra bola vytvorená, celková váha je {own_cost}")
+        self.infobox.log("Ukončujem algoritmus")   
 
         for edge in self.edges:
             if edge.id in mst_edges:
@@ -163,13 +180,28 @@ class App:
         
         self.__reset_vertices_and_edges(None)
         mst_edges = self.algorithms.kruskal()
+        if not mst_edges:
+            return
+        
         nx_G = self.build_nx_graph()
-        nx_mst = nx.minimum_spanning_tree(nx_G, algorithm="prim")
+        try:
+            nx_mst = nx.minimum_spanning_tree(nx_G, algorithm="prim")
+        except Exception as e:
+            self.infobox.clear()
+            self.infobox.log(f"Chyba: {str(e)}")
+            return
         nx_cost = nx_mst.size(weight="weight")
+        own_cost = self.__mst_cost_self(mst_edges)
 
-        if (nx_cost != self.__mst_cost_self(mst_edges)):
-            # TODO: Failed test
-            return    
+        self.infobox.log("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
+        if (nx_cost != own_cost):
+            self.infobox.log("Chyba: Test medzi vlastným algoritmom a NetworkX algoritmom zlyhal")
+            self.infobox.log(f"Váha NetworkX: {nx_cost}")
+            self.infobox.log(f"Váha Vlastného algoritmu: {own_cost}")
+            return  
+
+        self.infobox.log(f"Výsledky sedia - kostra bola vytvorená, celková váha je {own_cost}")
+        self.infobox.log("Ukončujem algoritmus")     
 
         for edge in self.edges:
             if edge.id in mst_edges:
