@@ -11,7 +11,7 @@ from classes.infobox import Infobox
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR,
                        DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
-# TODO: Fix for Dijkstra, Prim, Kruskal, to show Vertex tags in infobox, not IDS
+
 # TODO: Implement step-by-step algorithm visualization for DFS and BFS
 # TODO: Implement buttons to show step by step coloring for all algos
 
@@ -19,10 +19,12 @@ from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAUL
 class App:
     def __init__(self):
         self.state = None
-        self.zoom = 1
+        self.show_step = None
         self.selected_vertex = None
+        self.zoom = 1
         self.vertices = []
         self.edges = []
+        self.algorithm_steps_memory = []
         self.canvas_id_to_vertex = {}
         self.canvas_id_to_edge = {}
         self.root = tk.Tk()
@@ -39,6 +41,9 @@ class App:
         self.kruskal_button = Button(self, "kruskal", "KA", 1050, 20)
         self.dfs_button = Button(self, "dfs", "DFS", 1100, 20)
         self.bfs_button = Button(self, "bfs", "BFS", 1150, 20)
+        self.clear_infobox = Button(self, "clear_infobox", "CL", 20, 670)
+        self.previous_step = Button(self, "prev_step", "PS", 80, 670)
+        self.next_step = Button(self, "next_step", "NS", 140, 670)
         self.infobox = Infobox(self)
         self.algorithms = Algorithms(self)
         self.algorithm_fill = DEFAULT_ALGORITHM_FILL
@@ -64,6 +69,8 @@ class App:
         self.canvas_id_to_vertex[vertex.canvas_object_id] = vertex
         self.canvas_id_to_vertex[vertex.canvas_text] = vertex
 
+        self.algorithm_steps_memory.clear()
+
     def create_edge(self, event):
         if self.state != "add_edge":
             return
@@ -80,10 +87,14 @@ class App:
 
         self.edit_menu.render_add_edge_menu(event, start_vertex, end_vertex)
 
+        self.algorithm_steps_memory.clear()
+
     def visualize_dijkstra(self,event):
         if self.state != "dijkstra":
             return
         
+        self.algorithm_steps_memory.clear()
+
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasy(event.y)
         result = self.__check_if_clicked_on_vertex(x, y)
@@ -91,7 +102,6 @@ class App:
             return
         
         self.__reset_vertices_and_edges(event)
-        
         self.selected_vertex = None
         start_vertex, end_vertex = result
 
@@ -101,7 +111,7 @@ class App:
         if not own_result:
             return
 
-        own_res, edge_ids = own_result
+        own_res, edge_ids, path_tag, logs = own_result
 
         try:
             nx_res = nx.dijkstra_path(nx_G, start_vertex.id, end_vertex.id)
@@ -110,7 +120,7 @@ class App:
             self.infobox.log(f"Chyba: {str(e)}")
             return
 
-        self.infobox.log("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
+        logs += "Porovnávam výsledky z algoritmu s výsledkami z NetworkX\n"
 
         if nx_res != own_res:
             self.infobox.clear()
@@ -119,8 +129,13 @@ class App:
             self.infobox.log(f"Vlastný výsledok: {own_res}")
             return
         
-        self.infobox.log(f"Výsledky sedia - cesta {own_res}")
-        self.infobox.log("Ukončujem algoritmus")
+        logs += f"Výsledky sedia - cesta {path_tag}\n"
+        logs += "Ukončujem algoritmus\n"
+
+        self.infobox.log(logs)
+
+        self.algorithm_steps_memory = edge_ids
+        self.show_step = len(self.algorithm_steps_memory)
 
         for edge in self.edges:
             if edge.id in edge_ids:
@@ -131,6 +146,8 @@ class App:
     def visualize_prim(self, event):
         if self.state != "prim":
             return
+        
+        self.algorithm_steps_memory.clear()
         
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasy(event.y)
@@ -146,7 +163,11 @@ class App:
         
         self.__reset_vertices_and_edges(event)
 
-        mst_edges = self.algorithms.prim(start_vertex)
+        try:
+            mst_edges, logs = self.algorithms.prim(start_vertex)
+        except Exception:
+            return
+        
         if not mst_edges:
             return
 
@@ -160,15 +181,20 @@ class App:
         nx_cost = nx_mst.size(weight="weight")
         own_cost = self.__mst_cost_self(mst_edges)
 
-        self.infobox.log("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
+        logs += "Porovnávam výsledky z algoritmu s výsledkami z NetworkX\n"
         if (nx_cost != own_cost):
             self.infobox.log("Chyba: Test medzi vlastným algoritmom a NetworkX algoritmom zlyhal")
             self.infobox.log(f"Váha NetworkX: {nx_cost}")
             self.infobox.log(f"Váha Vlastného algoritmu: {own_cost}")
             return
 
-        self.infobox.log(f"Výsledky sedia - kostra bola vytvorená, celková váha je {own_cost}")
-        self.infobox.log("Ukončujem algoritmus")   
+        logs += f"Výsledky sedia - kostra bola vytvorená, celková váha je {own_cost}\n"
+        logs += "Ukončujem algoritmus\n"
+
+        self.infobox.log(logs)   
+
+        self.algorithm_steps_memory = mst_edges
+        self.show_step = len(self.algorithm_steps_memory)
 
         for edge in self.edges:
             if edge.id in mst_edges:
@@ -180,8 +206,14 @@ class App:
         if self.state != "kruskal":
             return
         
+        self.algorithm_steps_memory.clear()
+
         self.__reset_vertices_and_edges(None)
-        mst_edges = self.algorithms.kruskal()
+        try:
+            mst_edges, logs = self.algorithms.kruskal()
+        except Exception:
+            return
+        
         if not mst_edges:
             return
         
@@ -195,15 +227,21 @@ class App:
         nx_cost = nx_mst.size(weight="weight")
         own_cost = self.__mst_cost_self(mst_edges)
 
-        self.infobox.log("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
+        logs.append("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
         if (nx_cost != own_cost):
             self.infobox.log("Chyba: Test medzi vlastným algoritmom a NetworkX algoritmom zlyhal")
             self.infobox.log(f"Váha NetworkX: {nx_cost}")
             self.infobox.log(f"Váha Vlastného algoritmu: {own_cost}")
             return  
 
-        self.infobox.log(f"Výsledky sedia - kostra bola vytvorená, celková váha je {own_cost}")
-        self.infobox.log("Ukončujem algoritmus")     
+        logs.append(f"Výsledky sedia - kostra bola vytvorená, celková váha je {own_cost}")
+        logs.append("Ukončujem algoritmus")
+
+        for data in logs:
+            self.infobox.log(data)  
+
+        self.algorithm_steps_memory = mst_edges
+        self.show_step = len(self.algorithm_steps_memory)
 
         for edge in self.edges:
             if edge.id in mst_edges:
@@ -215,6 +253,8 @@ class App:
         if self.state != "bfs":
             return
         
+        self.algorithm_steps_memory.clear()
+
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasy(event.y)
 
@@ -254,6 +294,8 @@ class App:
         if self.state != "dfs":
             return
         
+        self.algorithm_steps_memory.clear()
+
         x = self.canvas.canvasx(event.x)
         y = self.canvas.canvasy(event.y)
 
@@ -330,7 +372,7 @@ class App:
         vertex = self.canvas_id_to_vertex[item_id]
 
         self.edit_menu.render_vertex_edit_menu(event, vertex)
-    
+  
     def edit_edge(self, event):
         self.state = None
 
@@ -370,6 +412,27 @@ class App:
 
         return G
     
+    def show_algorithm_step(self, go_to_next_step):
+        if not self.algorithm_steps_memory:
+            return
+        
+        if self.show_step is None:
+            self.show_step = 0
+            return
+        
+        self.show_step += 1 if go_to_next_step else -1
+
+        if self.show_step < 0 or self.show_step > len(self.algorithm_steps_memory):
+            self.show_step = 0
+
+        self.__show_algorithm_steps_in_memory(self.show_step)
+
+    def __show_algorithm_steps_in_memory(self, step):
+        self.__reset_vertices_and_edges(event=None)
+        for edge in self.edges:
+            if edge.id in self.algorithm_steps_memory[:step]:
+                self.canvas.itemconfig(edge.canvas_object_id, fill=self.algorithm_fill)  
+
     def __reset_vertices_and_edges(self, event):
         for vertex in self.vertices:
             self.canvas.itemconfig(vertex.canvas_object_id, fill=vertex.fill_color, outline=vertex.outline_color)
@@ -391,6 +454,7 @@ class App:
         self.vertices.clear()
         self.canvas_id_to_edge.clear()
         self.canvas_id_to_vertex.clear()
+        self.algorithm_steps_memory.clear()
         Vertex.identifier = 1
         Edge.identifier = 1
 
@@ -420,6 +484,7 @@ class App:
             if edge.id in edges:
                 cost += edge.weight
         return cost
+    
 
 
         

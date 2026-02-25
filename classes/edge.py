@@ -133,7 +133,8 @@ class Edge:
         self.line_color, self.box_color, self.weight_color = line, box, text
         self.app.canvas.itemconfig(self.canvas_object_id, fill=self.line_color)
         self.app.canvas.itemconfig(self.canvas_text_bg, outline=self.box_color)
-        self.app.canvas.itemconfig(self.canvas_text, fill=self.weight_color, text=self.weight)      
+        self.app.canvas.itemconfig(self.canvas_text, fill=self.weight_color, text=self.weight)   
+        self.app.algorithm_steps_memory.clear()   
 
     def delete(self):
         if self not in self.app.edges:
@@ -143,6 +144,7 @@ class Edge:
         self.app.canvas.delete(self.canvas_text_bg)
         self.app.canvas.delete(self.canvas_text)
         self.app.edges.remove(self)
+        self.app.algorithm_steps_memory.clear()
 
         for v in set(self.vertices):
             if self in v.edges:

@@ -12,30 +12,29 @@ class Algorithms:
             self.app.infobox.log("Chyba: Dijkstrov algoritmus nie je možné spusiť v grafe so zápornými hranami")
             return False
         
-        self.app.infobox.log(f"Spúštam Dijkstrov algoritmus od vrcholu {start_vertex.tag}")
-        self.app.infobox.log("Inicializujem vzdialenosti pre vrcholy na nekonečno")
+        logs = ""
+        logs += "Spúštam Dijkstrov algoritmus\n"
+        logs += f"Začínam na vrchole {start_vertex.tag}\n"
 
         distances = {v: float("inf") for v in self.app.vertices}
+        logs += "Inicializujem vzdialenosti pre vrcholy na nekonečno\n"
         previous = {}
         edges_visited = []
         distances[start_vertex] = 0
-        self.app.infobox.log(f"Pre vrchol {start_vertex.tag} nastavujem vzdialenosť 0")
+        logs += f"Pre počiatočný vrchol {start_vertex.tag} nastavujem vzdialenosť 0\n"
 
         pq = [(0, start_vertex.id, start_vertex)]
 
         while pq:
             current_dist, _, current = heapq.heappop(pq)
 
-            if (current != end_vertex):
-                self.app.infobox.log(f"Vyberám vrchol {current.tag} s aktuálnou vzdialenosťou {current_dist}")
-            else:
-                self.app.infobox.log("Navštívil som konečný vrchol, začínam rekonštrukciu cesty")
-
-            if current == end_vertex:
-                break
-
             if current_dist > distances[current]:
                 continue
+
+            logs += f"Vyberám vrchol {current.tag} s aktuálnou vzdialenosťou {current_dist}\n"
+            if current == end_vertex:
+                logs += f"Navštívil som konečný vrchol {end_vertex.tag}, začínam rekonštrukciu cesty\n"
+                break
 
             for edge in current.edges:
                 v1, v2, = edge.vertices
@@ -48,7 +47,7 @@ class Algorithms:
                     neighbour = v2 if v1 == current else v1
 
                 if edge not in edges_visited:
-                    self.app.infobox.log(f"Skúmam hranu {current.tag} -> {neighbour.tag} (váha {edge.weight})")
+                    logs += f"Skúmam hranu {current.tag} -> {neighbour.tag} (váha {edge.weight})\n"
 
                 new_dist = current_dist + edge.weight
 
@@ -56,10 +55,10 @@ class Algorithms:
                     distances[neighbour] = new_dist
                     previous[neighbour] = (current, edge)
                     heapq.heappush(pq, (new_dist, neighbour.id, neighbour))
-                    self.app.infobox.log(f"Našla sa kratšia vzdialenosť - aktualizujem vzdialenosť do vrcholu {neighbour.tag} na hodnotu {new_dist}")
+                    logs += f"Našla sa kratšia vzdialenosť - aktualizujem vzdialenosť do vrcholu {neighbour.tag} na hodnotu {new_dist}\n"
                 else:
                     if edge not in edges_visited:
-                        self.app.infobox.log(f"Neaktualizujem vrchol {neighbour.tag} - aktuálna vzdialenosť je kratšia.")
+                        logs += f"Neaktualizujem vrchol {neighbour.tag} - aktuálna vzdialenosť je kratšia.\n"
                 
                 edges_visited.append(edge)
 
@@ -68,18 +67,21 @@ class Algorithms:
             return None
         
         path = []
+        path_tag = []
         edge_ids = []
         current = end_vertex
 
         while current != start_vertex:
             path.insert(0, current.id)
+            path_tag.insert(0, current.tag)
             prev_vertex, prev_edge = previous[current]
             edge_ids.insert(0, prev_edge.id)
             current = prev_vertex
 
         path.insert(0, start_vertex.id)
+        path_tag.insert(0, start_vertex.tag)
 
-        return (path, edge_ids)
+        return (path, edge_ids, path_tag, logs)
     
     def prim(self, start_vertex):
         self.app.infobox.clear()
@@ -92,8 +94,9 @@ class Algorithms:
         mst_edges = []
         pq = []
         visited_edges = []
-        self.app.infobox.log(f"Spúštam Primov algoritmus od vrcholu {start_vertex.tag}")
-
+        logs = ""
+        logs += f"Spúštam Primov algoritmus od vrcholu {start_vertex.tag}\n"
+        logs += f"Vrchol {start_vertex.tag} pridávam do minimálnej kostry\n"
         visited.add(start_vertex)
 
         counter = 0
@@ -107,14 +110,15 @@ class Algorithms:
         while pq:
             weight, _, u, v, edge = heapq.heappop(pq)
 
-            if v in visited:
-                continue
+            logs += f"Kontrolujem hranu ({u.tag} - {v.tag}) s váhou {weight}\n"
 
-            self.app.infobox.log(f"Najlacnejšia cesta bez vzniku cyklu do vrcholu {v.tag} vedie z vrcholu {u.tag} pomocou hrany s hodnotou {weight}")
+            if v in visited:
+                logs += "Vrchol už patrí do minimálnej kostry, preskakujem\n"
+                continue
 
             visited.add(v)
             mst_edges.append(edge.id)
-            self.app.infobox.log(f"Vrchol {v.tag} prídavam do navštívených a hranu ({u.tag} - {v.tag}, váha: {weight}) pridávam do MST")
+            logs += "Vrchol a hranu pridávam do minimálnej kostry\n"
             visited_edges.append(edge)
 
             for edge in v.edges:
@@ -125,7 +129,7 @@ class Algorithms:
                     heapq.heappush(pq, (edge.weight, counter, v, neighbour, edge))
                     counter += 1
 
-        return mst_edges
+        return (mst_edges, logs)
     
     def kruskal(self):
         self.app.infobox.clear()
@@ -135,6 +139,7 @@ class Algorithms:
             return False
         
         size = len(self.app.vertices)
+        logs = []
 
         edges = []
         for edge in self.app.edges:
@@ -142,7 +147,9 @@ class Algorithms:
             edges.append((edge.weight, edge.id, v1.id - 1, v2.id - 1, v1.tag, v2.tag))
 
         edges.sort()
-        self.app.infobox.log("Spúštam Kruskalov algoritmus a zoraďujem si hrany od najmenšej po najväčšiu")
+
+        # Kvôli lokálnej premnej v union funkcií používame zoznam
+        logs.append("Spúštam Kruskalov algoritmus a zoraďujem si hrany od najmenšej po najväčšiu")
 
         parent = list(range(size))
         rank = [0] * size
@@ -152,13 +159,13 @@ class Algorithms:
                 parent[i] = find(parent[i])
             return parent[i]
         
-        def union(x, y, x_tag, y_tag, weight):
+        def union(x, y, x_tag, y_tag, weight, logs):
             root_x = find(x)
             root_y = find(y)
-            self.app.infobox.log(f"Kontrola hrany medzi vrcholmi {x_tag} - {y_tag} s váhou {weight}")
+            logs.append(f"Kontrola hrany medzi vrcholmi {x_tag} - {y_tag} s váhou {weight}")
 
             if root_x == root_y:
-                self.app.infobox.log("Vznikol cyklus, preskakujem")
+                logs.append("Vznikol cyklus, preskakujem")
                 return False
             
             if rank[root_x] < rank[root_y]:
@@ -169,15 +176,15 @@ class Algorithms:
                 parent[root_y] = root_x
                 rank[root_x] += 1
 
-            self.app.infobox.log(f"Bola vybraná hrana {x_tag} - {y_tag} s váhou {weight}")
+            logs.append("Cyklus nevznikol, pridávam ju do minimálnej kostry grafu")
             return True
         
-        mst = []
+        mst_edges = []
         for weight, edge_id, u, v, u_tag, v_tag in edges:
-            if union(u,v, u_tag, v_tag, weight):
-                mst.append(edge_id)
+            if union(u,v, u_tag, v_tag, weight, logs):
+                mst_edges.append(edge_id)
 
-        return mst
+        return (mst_edges, logs)
     
     def bfs(self, start_vertex):
         visited = set()

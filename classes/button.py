@@ -16,19 +16,37 @@ class Button:
         self.app.canvas.unbind("<ButtonRelease-1>")
         if (self.app.state == "add_vertex"):
             self.app.canvas.bind("<Button-1>", self.app.create_vertex)
-        elif(self.app.state == "move_vertex"):
+        elif (self.app.state == "move_vertex"):
             self.app.canvas.bind("<Button-1>", self.app.start_move_vertex)
             self.app.canvas.bind("<B1-Motion>", self.app.move_vertex)
             self.app.canvas.bind("<ButtonRelease-1>", self.app.stop_move_vertex)
         elif (self.app.state == "add_edge"):
             self.app.canvas.bind("<Button-1>", self.app.create_edge)
         elif (self.app.state == "dijkstra"):
+            if self.app.vertices and self.app.edges:
+                self.app.infobox.clear()
+                self.app.infobox.log("Vyber začiatočný a konečný vrchol kliknutím")
             self.app.canvas.bind("<Button-1>", self.app.visualize_dijkstra)
         elif (self.app.state == "prim"):
+            if self.app.vertices and self.app.edges:
+                self.app.infobox.clear()
+                self.app.infobox.log("Vyber začiatočný vrchol kliknutím")
             self.app.canvas.bind("<Button-1>", self.app.visualize_prim)
         elif (self.app.state == "kruskal"):
             self.app.visualize_kruskal()
         elif (self.app.state == "dfs"):
+            if self.app.vertices and self.app.edges:
+                self.app.infobox.clear()
+                self.app.infobox.log("Vyber začiatočný vrchol kliknutím")
             self.app.canvas.bind("<Button-1>", self.app.visualize_dfs)
         elif (self.app.state == "bfs"):
+            if self.app.vertices and self.app.edges:
+                self.app.infobox.clear()
+                self.app.infobox.log("Vyber začiatočný vrchol kliknutím")
             self.app.canvas.bind("<Button-1>", self.app.visualize_bfs)
+        elif (self.app.state == "clear_infobox"):
+            self.app.infobox.clear()
+        elif (self.app.state == "prev_step"):
+            self.app.show_algorithm_step(False)
+        elif (self.app.state == "next_step"):
+            self.app.show_algorithm_step(True)

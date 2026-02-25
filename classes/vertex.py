@@ -55,3 +55,5 @@ class Vertex:
 
         for cid in (self.canvas_object_id, self.canvas_text):
             self.app.canvas_id_to_vertex.pop(cid, None)
+
+        self.app.algorithm_steps_memory.clear()
