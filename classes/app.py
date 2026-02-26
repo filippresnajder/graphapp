@@ -12,7 +12,6 @@ from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAUL
                        DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
 
-# TODO: Implement step-by-step algorithm visualization for DFS and BFS
 # TODO: Implement buttons to show step by step coloring for all algos
 
 
@@ -120,7 +119,7 @@ class App:
             self.infobox.log(f"Chyba: {str(e)}")
             return
 
-        logs += "Porovnávam výsledky z algoritmu s výsledkami z NetworkX\n"
+        logs.append("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
 
         if nx_res != own_res:
             self.infobox.clear()
@@ -129,13 +128,14 @@ class App:
             self.infobox.log(f"Vlastný výsledok: {own_res}")
             return
         
-        logs += f"Výsledky sedia - cesta {path_tag}\n"
-        logs += "Ukončujem algoritmus\n"
-
-        self.infobox.log(logs)
+        logs.append(f"Výsledky sedia - cesta {path_tag}")
+        logs.append("Ukončujem algoritmus")
 
         self.algorithm_steps_memory = edge_ids
         self.show_step = len(self.algorithm_steps_memory)
+
+        for data in logs:
+            self.infobox.log(data)  
 
         for edge in self.edges:
             if edge.id in edge_ids:
@@ -181,17 +181,18 @@ class App:
         nx_cost = nx_mst.size(weight="weight")
         own_cost = self.__mst_cost_self(mst_edges)
 
-        logs += "Porovnávam výsledky z algoritmu s výsledkami z NetworkX\n"
+        logs.append("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
         if (nx_cost != own_cost):
             self.infobox.log("Chyba: Test medzi vlastným algoritmom a NetworkX algoritmom zlyhal")
             self.infobox.log(f"Váha NetworkX: {nx_cost}")
             self.infobox.log(f"Váha Vlastného algoritmu: {own_cost}")
             return
 
-        logs += f"Výsledky sedia - kostra bola vytvorená, celková váha je {own_cost}\n"
-        logs += "Ukončujem algoritmus\n"
+        logs.append(f"Výsledky sedia - kostra bola vytvorená, celková váha je {own_cost}")
+        logs.append("Ukončujem algoritmus\n")
 
-        self.infobox.log(logs)   
+        for data in logs:
+            self.infobox.log(data)     
 
         self.algorithm_steps_memory = mst_edges
         self.show_step = len(self.algorithm_steps_memory)
@@ -274,19 +275,24 @@ class App:
         nx_tree = nx.bfs_tree(nx_G, start_vertex.id)
         nx_edges = sorted(sorted(edge) for edge in nx_tree.edges())
 
-        own_order, own_tree_edges = self.algorithms.bfs(start_vertex)
+        own_order, own_tree_edges, logs = self.algorithms.bfs(start_vertex)
         own_sorted = sorted(sorted(edge) for edge in own_tree_edges)
 
+        logs.append("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
         if nx_edges != own_sorted:
-            # TODO: Handle when test fails - Fixnut zmeny hran
-            print("nx:", nx_edges)
-            print("own:", own_sorted)
+            self.infobox.log("Chyba: Test medzi vlastným algoritmom a NetworkX algoritmom zlyhal")
             return
+
+        logs.append("Výsledky sedia, ukončujem algoritmus")
+
+        for data in logs:
+            self.infobox.log(data)
 
         for index, vertex_id in enumerate(own_order, start=1):
             for vertex in self.vertices:
                 if vertex.id == vertex_id:
-                    self.canvas.itemconfig(vertex.canvas_text, text=str(index), fill=self.algorithm_fill)
+                    self.canvas.itemconfig(vertex.canvas_object_id, fill=self.algorithm_fill)
+                    self.canvas.itemconfig(vertex.canvas_text, text=str(index), fill="white")
 
         self.state = None
 
@@ -315,19 +321,25 @@ class App:
         nx_tree = nx.dfs_tree(nx_G, start_vertex.id, sort_neighbors=sorted)
         nx_edges = {tuple(sorted(edge)) for edge in nx_tree.edges()}
 
-        own_order, own_tree_edges = self.algorithms.dfs(start_vertex)
+        own_order, own_tree_edges, logs = self.algorithms.dfs(start_vertex)
         own_edges = {tuple(sorted(edge)) for edge in own_tree_edges}
 
+        logs.append("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
         if nx_edges != own_edges:
-            # TODO: Handle when test fails - Fixnut zmeny hran
-            print("nx:", nx_edges)
-            print("own:", own_edges)
+            self.infobox.log("Chyba: Test medzi vlastným algoritmom a NetworkX algoritmom zlyhal")
             return
+        
+        logs.append("Výsledky sedia, ukončujem algoritmus")
+
+
+        for data in logs:
+            self.infobox.log(data)
         
         for index, vertex_id in enumerate(own_order, start=1):
             for vertex in self.vertices:
                 if vertex.id == vertex_id:
-                    self.canvas.itemconfig(vertex.canvas_text, text=str(index), fill=self.algorithm_fill)
+                    self.canvas.itemconfig(vertex.canvas_object_id, fill=self.algorithm_fill)
+                    self.canvas.itemconfig(vertex.canvas_text, text=str(index), fill="white")
 
         self.state = None
 

@@ -12,16 +12,16 @@ class Algorithms:
             self.app.infobox.log("Chyba: Dijkstrov algoritmus nie je možné spusiť v grafe so zápornými hranami")
             return False
         
-        logs = ""
-        logs += "Spúštam Dijkstrov algoritmus\n"
-        logs += f"Začínam na vrchole {start_vertex.tag}\n"
+        logs = []
+        logs.append("Spúštam Dijkstrov algoritmus")
+        logs.append(f"Začínam na vrchole {start_vertex.tag}")
 
         distances = {v: float("inf") for v in self.app.vertices}
-        logs += "Inicializujem vzdialenosti pre vrcholy na nekonečno\n"
+        logs.append("Inicializujem vzdialenosti pre vrcholy na nekonečno")
         previous = {}
         edges_visited = []
         distances[start_vertex] = 0
-        logs += f"Pre počiatočný vrchol {start_vertex.tag} nastavujem vzdialenosť 0\n"
+        logs.append(f"Pre počiatočný vrchol {start_vertex.tag} nastavujem vzdialenosť 0")
 
         pq = [(0, start_vertex.id, start_vertex)]
 
@@ -31,9 +31,9 @@ class Algorithms:
             if current_dist > distances[current]:
                 continue
 
-            logs += f"Vyberám vrchol {current.tag} s aktuálnou vzdialenosťou {current_dist}\n"
+            logs.append(f"Vyberám vrchol {current.tag} s aktuálnou vzdialenosťou {current_dist}")
             if current == end_vertex:
-                logs += f"Navštívil som konečný vrchol {end_vertex.tag}, začínam rekonštrukciu cesty\n"
+                logs.append(f"Navštívil som konečný vrchol {end_vertex.tag}, začínam rekonštrukciu cesty")
                 break
 
             for edge in current.edges:
@@ -47,7 +47,7 @@ class Algorithms:
                     neighbour = v2 if v1 == current else v1
 
                 if edge not in edges_visited:
-                    logs += f"Skúmam hranu {current.tag} -> {neighbour.tag} (váha {edge.weight})\n"
+                    logs.append(f"Skúmam hranu {current.tag} -> {neighbour.tag} (váha {edge.weight})")
 
                 new_dist = current_dist + edge.weight
 
@@ -55,10 +55,10 @@ class Algorithms:
                     distances[neighbour] = new_dist
                     previous[neighbour] = (current, edge)
                     heapq.heappush(pq, (new_dist, neighbour.id, neighbour))
-                    logs += f"Našla sa kratšia vzdialenosť - aktualizujem vzdialenosť do vrcholu {neighbour.tag} na hodnotu {new_dist}\n"
+                    logs.append(f"Našla sa kratšia vzdialenosť - aktualizujem vzdialenosť do vrcholu {neighbour.tag} na hodnotu {new_dist}")
                 else:
                     if edge not in edges_visited:
-                        logs += f"Neaktualizujem vrchol {neighbour.tag} - aktuálna vzdialenosť je kratšia.\n"
+                        logs.append(f"Neaktualizujem vrchol {neighbour.tag} - aktuálna vzdialenosť je kratšia.")
                 
                 edges_visited.append(edge)
 
@@ -94,9 +94,9 @@ class Algorithms:
         mst_edges = []
         pq = []
         visited_edges = []
-        logs = ""
-        logs += f"Spúštam Primov algoritmus od vrcholu {start_vertex.tag}\n"
-        logs += f"Vrchol {start_vertex.tag} pridávam do minimálnej kostry\n"
+        logs = []
+        logs.append(f"Spúštam Primov algoritmus od vrcholu {start_vertex.tag}")
+        logs.append(f"Vrchol {start_vertex.tag} pridávam do minimálnej kostry")
         visited.add(start_vertex)
 
         counter = 0
@@ -110,15 +110,15 @@ class Algorithms:
         while pq:
             weight, _, u, v, edge = heapq.heappop(pq)
 
-            logs += f"Kontrolujem hranu ({u.tag} - {v.tag}) s váhou {weight}\n"
+            logs.append(f"Kontrolujem hranu ({u.tag} - {v.tag}) s váhou {weight}")
 
             if v in visited:
-                logs += "Vrchol už patrí do minimálnej kostry, preskakujem\n"
+                logs.append("Vrchol už patrí do minimálnej kostry, preskakujem")
                 continue
 
             visited.add(v)
             mst_edges.append(edge.id)
-            logs += "Vrchol a hranu pridávam do minimálnej kostry\n"
+            logs.append("Vrchol a hranu pridávam do minimálnej kostry")
             visited_edges.append(edge)
 
             for edge in v.edges:
@@ -148,7 +148,6 @@ class Algorithms:
 
         edges.sort()
 
-        # Kvôli lokálnej premnej v union funkcií používame zoznam
         logs.append("Spúštam Kruskalov algoritmus a zoraďujem si hrany od najmenšej po najväčšiu")
 
         parent = list(range(size))
@@ -159,7 +158,7 @@ class Algorithms:
                 parent[i] = find(parent[i])
             return parent[i]
         
-        def union(x, y, x_tag, y_tag, weight, logs):
+        def union(x, y, x_tag, y_tag, weight):
             root_x = find(x)
             root_y = find(y)
             logs.append(f"Kontrola hrany medzi vrcholmi {x_tag} - {y_tag} s váhou {weight}")
@@ -181,7 +180,7 @@ class Algorithms:
         
         mst_edges = []
         for weight, edge_id, u, v, u_tag, v_tag in edges:
-            if union(u,v, u_tag, v_tag, weight, logs):
+            if union(u,v, u_tag, v_tag, weight):
                 mst_edges.append(edge_id)
 
         return (mst_edges, logs)
@@ -191,14 +190,24 @@ class Algorithms:
         queue = deque()
         traversal_order = []
         tree_edges = []
+        logs = []
+
+        logs.append("Spúšťam algoritmus BFS")
 
         visited.add(start_vertex)
         queue.append(start_vertex)
 
+        counter = 1
+        visited_number = {}
+        visited_number[start_vertex] = counter
+        counter += 1
+
         while queue:
             current = queue.popleft()
             traversal_order.append(current.id)
+            logs.append(f"Navštevujem vrchol s pôvodným označením {current.tag} -> (poradie v BFS - {visited_number[current]})")
 
+            logs.append(f"Pozerám sa na všetky hrany, ktoré vedú z vrcholu {current.tag} -> (poradie v BFS - {visited_number[current]})")
             for edge in current.edges:
                 v1, v2 = edge.vertices
 
@@ -210,22 +219,34 @@ class Algorithms:
                     neighbour = v2 if v1 == current else v1
 
                 if neighbour not in visited:
+                    visited_number[neighbour] = counter
+                    logs.append(f"Vrchol s pôvodným označením {neighbour.tag} ešte nebol navštívený, navštevujem ho -> (Určujem mu poradie v BFS na {counter})")
                     visited.add(neighbour)
                     queue.append(neighbour)
                     tree_edges.append((current.id, neighbour.id))
+                    counter += 1
 
-        return traversal_order, tree_edges
+        return (traversal_order, tree_edges, logs)
     
     def dfs(self, start_vertex):
         visited = set()
         traversal_order = []
         tree_edges = []
+        logs = []
+
+        visited_number = {}
+        counter = 1
+        visited_number[start_vertex] = counter
+        counter += 1
 
         def dfs_visit(current):
+            nonlocal counter
             visited.add(current.id)
             traversal_order.append(current.id)
+            logs.append(f"Navštevujem vrchol s pôvodným označením {current.tag} -> (poradie v DFS - {visited_number[current]})")
 
             neighbours = []
+            logs.append(f"Pozerám sa na všetky hrany, ktoré vedú z vrcholu {current.tag} -> (poradie v DFS - {visited_number[current]})")
             for edge in current.edges:
                 v1, v2 = edge.vertices
 
@@ -239,15 +260,24 @@ class Algorithms:
                 neighbours.append(neighbour)
 
             neighbours = sorted(neighbours, key=lambda v: v.id)
+            neighbours_to_visit = [neighbour for neighbour in neighbours if neighbour.id not in visited]
 
-            for neighbour in neighbours:
+            if neighbours_to_visit:
+                logs.append("Zoraďujem vrcholy")
+            else:
+                logs.append("Nenašli sa žiadne dostupné vrcholy, presúvam sa ďalej")
+
+            for neighbour in neighbours_to_visit:
                 if neighbour.id not in visited:
+                    visited_number[neighbour] = counter
+                    logs.append(f"Vrchol s pôvodným označením {neighbour.tag} ešte nebol navštívený, navštevujem ho -> (Určujem mu poradie v DFS na {counter})")
                     tree_edges.append((current.id, neighbour.id))
+                    counter += 1
                     dfs_visit(neighbour)
         
         dfs_visit(start_vertex)
 
-        return traversal_order, tree_edges
+        return (traversal_order, tree_edges, logs)
     
     def __is_graph_oriented(self):
         for edge in self.app.edges:
