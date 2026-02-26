@@ -186,6 +186,7 @@ class Algorithms:
         return (mst_edges, logs)
     
     def bfs(self, start_vertex):
+        self.app.infobox.clear()
         visited = set()
         queue = deque()
         traversal_order = []
@@ -229,6 +230,7 @@ class Algorithms:
         return (traversal_order, tree_edges, logs)
     
     def dfs(self, start_vertex):
+        self.app.infobox.clear()
         visited = set()
         traversal_order = []
         tree_edges = []

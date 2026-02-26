@@ -134,7 +134,11 @@ class Edge:
         self.app.canvas.itemconfig(self.canvas_object_id, fill=self.line_color)
         self.app.canvas.itemconfig(self.canvas_text_bg, outline=self.box_color)
         self.app.canvas.itemconfig(self.canvas_text, fill=self.weight_color, text=self.weight)   
-        self.app.algorithm_steps_memory.clear()   
+        if self.app.algorithm_state["steps"]:
+            self.app.infobox.clear()
+            self.app.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
+            self.app.reset_vertices_and_edges(event=None)
+        self.app.clear_algorithm_state()
 
     def delete(self):
         if self not in self.app.edges:
@@ -144,7 +148,11 @@ class Edge:
         self.app.canvas.delete(self.canvas_text_bg)
         self.app.canvas.delete(self.canvas_text)
         self.app.edges.remove(self)
-        self.app.algorithm_steps_memory.clear()
+        if self.app.algorithm_state["steps"]:
+            self.app.infobox.clear()
+            self.app.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
+            self.app.reset_vertices_and_edges(event=None)
+        self.app.clear_algorithm_state()
 
         for v in set(self.vertices):
             if self in v.edges:
