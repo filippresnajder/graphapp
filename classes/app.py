@@ -14,11 +14,7 @@ from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAUL
 # TODO: Implement new button design
 # TODO: Implement algorithm info
 # TODO: Implement export and import to graphs
-
-
-
-# LATER TODO: Check two graphs not connected to one another causing Prim and Kruskal to fail (NetworkX test FAILS)
-# Os. poznámka - Spýtať sa na konzultáciach ohľadom Prima a Kruskala
+# TODO: Fix disconnected graphs still calculation MST in Prim/Kruskal
 
 class App:
     def __init__(self):
