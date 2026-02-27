@@ -12,7 +12,6 @@ from classes.user_interface import UserInterface
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR,
                        DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
-# TODO: Implement new button design
 # TODO: Implement algorithm info
 # TODO: Fix disconnected graphs still calculation MST in Prim/Kruskal
 # TODO: Implement export and import to graphs
@@ -42,18 +41,18 @@ class App:
         self.add_vertex_button = Button(self,"add_vertex","Pridať vrchol")
         self.add_edge_button = Button(self,"add_edge", "Pridať hranu")
         self.move_vertex_button = Button(self,"move_vertex","Posunúť vrchol")
-        self.top_ui = UserInterface([self.add_vertex_button, self.add_edge_button, self.move_vertex_button], 800, 15, 110)
+        self.top_ui = UserInterface([self.add_vertex_button, self.add_edge_button, self.move_vertex_button], 800, 20, 110)
         self.algorithms_button = Button(self, "show_algorithms", "Algoritmy")
         self.dijkstra_button = Button(self, "dijkstra", "Dijkstra")
         self.prim_button = Button(self, "prim", "Prim")
         self.kruskal_button = Button(self, "kruskal", "Kruskal")
         self.dfs_button = Button(self, "dfs", "DFS")
         self.bfs_button = Button(self, "bfs", "BFS")
-        self.algorithm_dropdown = UserInterface([self.algorithms_button, self.dijkstra_button, self.prim_button, self.kruskal_button, self.dfs_button, self.bfs_button], 1130, 15, 28, True)
+        self.algorithm_dropdown = UserInterface([self.algorithms_button, self.dijkstra_button, self.prim_button, self.kruskal_button, self.dfs_button, self.bfs_button], 1130, 20, 24, True)
         self.clear_infobox = Button(self, "clear_infobox", "Prečisti", "small")
         self.previous_step = Button(self, "prev_step", "<", "small")
         self.next_step = Button(self, "next_step", ">", "small")
-        self.bottom_ui = UserInterface([self.clear_infobox, self.previous_step, self.next_step], 45, 665, 60)
+        self.bottom_ui = UserInterface([self.clear_infobox, self.previous_step, self.next_step], 45, 670, 60)
         self.infobox = Infobox(self, 240, 610, 20, 50)
         self.algorithms = Algorithms(self)
         self.algorithm_fill = DEFAULT_ALGORITHM_FILL

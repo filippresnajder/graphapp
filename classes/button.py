@@ -8,7 +8,7 @@ class Button:
         self.btn_type = btn_type
         self.label = label
         self.size = size
-        self.button = tk.Button(self.app.root, bg=DEFAULT_BUTTON_COLOR, text=self.label, font=("Arial", 10), width=6 if self.size == "small" else 12, command=self.onclick)
+        self.button = tk.Button(self.app.root, bg=DEFAULT_BUTTON_COLOR, text=self.label, font=("Arial", 10), width=6 if self.size == "small" else 12, highlightthickness=0, border=0, command=self.onclick)
         self.x = 0
         self.y = 0
         self.visible = True

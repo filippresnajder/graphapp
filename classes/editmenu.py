@@ -50,8 +50,8 @@ class EditMenu:
 
         button_frame = tk.Frame(popup, background=DEFAULT_BG_COLOR)
         button_frame.pack(pady=5)
-        tk.Button(button_frame, text="Zavrieť", command=close, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR).pack(side="left", padx=3)
-        tk.Button(button_frame, text="Vytvoriť", command=save, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR).pack(side="right", padx=3) 
+        tk.Button(button_frame, text="Zavrieť", command=close, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR, highlightthickness=0, border=0).pack(side="left", padx=3)
+        tk.Button(button_frame, text="Vytvoriť", command=save, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR, highlightthickness=0, border=0).pack(side="right", padx=3) 
 
     def render_edge_edit_menu(self, event, edge):
         popup = tk.Toplevel(self.app.root, background=DEFAULT_BG_COLOR)
@@ -93,21 +93,21 @@ class EditMenu:
         line_col_frame = tk.Frame(popup, background=DEFAULT_BG_COLOR)
         line_col_frame.pack(pady=5)
         line_col_label = tk.Label(line_col_frame, text="Farba čiary:", background=DEFAULT_BG_COLOR, foreground=DEFAULT_UI_TEXT_COLOR)
-        line_col_button = tk.Button(line_col_frame, bg=edge.line_color, width=DEFAULT_WIDTH, command=lambda: change_color("line"))
+        line_col_button = tk.Button(line_col_frame, bg=edge.line_color, width=DEFAULT_WIDTH, highlightthickness=0, border=0, command=lambda: change_color("line"))
         line_col_label.pack(side="left", padx=3)
         line_col_button.pack(side="right", padx=3)
 
         box_col_frame = tk.Frame(popup, background=DEFAULT_BG_COLOR)
         box_col_frame.pack(pady=5)
         box_col_label = tk.Label(box_col_frame, text="Farba okraja:", background=DEFAULT_BG_COLOR, foreground=DEFAULT_UI_TEXT_COLOR)
-        box_col_button = tk.Button(box_col_frame, bg=edge.box_color, width=DEFAULT_WIDTH, command=lambda: change_color("box"))
+        box_col_button = tk.Button(box_col_frame, bg=edge.box_color, width=DEFAULT_WIDTH, highlightthickness=0, border=0, command=lambda: change_color("box"))
         box_col_label.pack(side="left", padx=3)
         box_col_button.pack(side="right", padx=3)
 
         text_col_frame = tk.Frame(popup, background=DEFAULT_BG_COLOR)
         text_col_frame.pack(pady=5)
         text_col_label = tk.Label(text_col_frame, text="Farba textu:", background=DEFAULT_BG_COLOR, foreground=DEFAULT_UI_TEXT_COLOR)
-        text_col_button = tk.Button(text_col_frame, bg=edge.weight_color, width=DEFAULT_WIDTH, command=lambda: change_color("weight"))
+        text_col_button = tk.Button(text_col_frame, bg=edge.weight_color, width=DEFAULT_WIDTH, highlightthickness=0, border=0, command=lambda: change_color("weight"))
         text_col_label.pack(side="left", padx=3)
         text_col_button.pack(side="right", padx=3)
 
@@ -119,9 +119,9 @@ class EditMenu:
 
         button_frame = tk.Frame(popup, background=DEFAULT_BG_COLOR)
         button_frame.pack(pady=5)
-        tk.Button(button_frame, text="Zavrieť", command=popup.destroy, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR).pack(side="left", padx=3)
-        tk.Button(button_frame, text="Uložiť", command=save, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR).pack(side="left", padx=3)
-        tk.Button(button_frame, text="Vymazať", command=delete, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR).pack(side="right", padx=3)      
+        tk.Button(button_frame, text="Zavrieť", command=popup.destroy, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR, highlightthickness=0, border=0,).pack(side="left", padx=3)
+        tk.Button(button_frame, text="Uložiť", command=save, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR, highlightthickness=0, border=0,).pack(side="left", padx=3)
+        tk.Button(button_frame, text="Vymazať", command=delete, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR, highlightthickness=0, border=0,).pack(side="right", padx=3)      
 
     def render_vertex_edit_menu(self, event, vertex):
         popup = tk.Toplevel(self.app.root, background=DEFAULT_BG_COLOR)
@@ -160,21 +160,21 @@ class EditMenu:
         fill_frame = tk.Frame(popup, background=DEFAULT_BG_COLOR)
         fill_frame.pack(pady=5)
         fill_frame_label = tk.Label(fill_frame, text="Farba výplne:", background=DEFAULT_BG_COLOR, foreground=DEFAULT_UI_TEXT_COLOR)
-        change_fill_color = tk.Button(fill_frame, bg=vertex.fill_color, width=DEFAULT_WIDTH, command=lambda: change_color("fill"))
+        change_fill_color = tk.Button(fill_frame, bg=vertex.fill_color, width=DEFAULT_WIDTH, highlightthickness=0, border=0, command=lambda: change_color("fill"))
         fill_frame_label.pack(side="left", padx=3)
         change_fill_color.pack(side="right", padx=3)
 
         outline_frame = tk.Frame(popup, background=DEFAULT_BG_COLOR)
         outline_frame.pack(pady=5)
         outline_frame_label = tk.Label(outline_frame, text="Farba okraja:", background=DEFAULT_BG_COLOR, foreground=DEFAULT_UI_TEXT_COLOR)
-        change_outline_color = tk.Button(outline_frame, bg=vertex.outline_color, width=DEFAULT_WIDTH, command=lambda: change_color("outline"))
+        change_outline_color = tk.Button(outline_frame, bg=vertex.outline_color, width=DEFAULT_WIDTH, highlightthickness=0, border=0, command=lambda: change_color("outline"))
         outline_frame_label.pack(side="left", padx=3)
         change_outline_color.pack(side="right", padx=3)
 
         text_frame = tk.Frame(popup, background=DEFAULT_BG_COLOR)
         text_frame.pack(pady=5)
         text_frame_label = tk.Label(text_frame, text="Farba textu:", background=DEFAULT_BG_COLOR, foreground=DEFAULT_UI_TEXT_COLOR)
-        change_text_color = tk.Button(text_frame, bg=vertex.text_color, width=DEFAULT_WIDTH, command=lambda: change_color("text"))
+        change_text_color = tk.Button(text_frame, bg=vertex.text_color, width=DEFAULT_WIDTH, highlightthickness=0, border=0, command=lambda: change_color("text"))
         text_frame_label.pack(side="left", padx=3)
         change_text_color.pack(side="right", padx=3)
 
@@ -186,6 +186,6 @@ class EditMenu:
 
         button_frame = tk.Frame(popup, background=DEFAULT_BG_COLOR)
         button_frame.pack(pady=5)
-        tk.Button(button_frame, text="Zavrieť", command=popup.destroy, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR).pack(side="left", padx=3)
-        tk.Button(button_frame, text="Uložiť", command=save, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR).pack(side="left", padx=3)
-        tk.Button(button_frame, text="Vymazať", command=delete, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR).pack(side="right", padx=3)     
+        tk.Button(button_frame, text="Zavrieť", command=popup.destroy, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR, highlightthickness=0, border=0).pack(side="left", padx=3)
+        tk.Button(button_frame, text="Uložiť", command=save, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR, highlightthickness=0, border=0).pack(side="left", padx=3)
+        tk.Button(button_frame, text="Vymazať", command=delete, background=DEFAULT_BUTTON_COLOR, foreground=DEFAULT_UI_TEXT_COLOR, highlightthickness=0, border=0).pack(side="right", padx=3)     
