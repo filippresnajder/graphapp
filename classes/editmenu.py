@@ -57,7 +57,7 @@ class EditMenu:
         popup = tk.Toplevel(self.app.root, background=DEFAULT_BG_COLOR)
         popup.resizable(False, False)
         popup.title("Edit")
-        popup.geometry("250x220+{}+{}".format(event.x_root, event.y_root))
+        popup.geometry("250x200+{}+{}".format(event.x_root, event.y_root))
 
         def change_color(obj_type):
             color = colorchooser.askcolor(parent=popup)[1]
@@ -127,7 +127,7 @@ class EditMenu:
         popup = tk.Toplevel(self.app.root, background=DEFAULT_BG_COLOR)
         popup.resizable(False, False)
         popup.title("Edit")
-        popup.geometry("250x220+{}+{}".format(event.x_root, event.y_root))
+        popup.geometry("250x200+{}+{}".format(event.x_root, event.y_root))
 
         def change_color(obj_type):
             color = colorchooser.askcolor(parent=popup)[1]
