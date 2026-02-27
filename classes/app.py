@@ -15,6 +15,9 @@ from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAUL
 # TODO: Implement algorithm info
 # TODO: Implement export and import to graphs
 
+
+# LATER TODO: Check for infobox what is written what is not etc make sure info is readable
+
 class App:
     def __init__(self):
         self.state = None
