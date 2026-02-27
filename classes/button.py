@@ -1,14 +1,12 @@
 import tkinter as tk
 
-from constants import DEFAULT_BUTTON_COLOR
-
 class Button:
-    def __init__(self, app, btn_type, label, size="normal"):
+    def __init__(self, app, btn_type, label, color, size="normal"):
         self.app = app
         self.btn_type = btn_type
         self.label = label
         self.size = size
-        self.button = tk.Button(self.app.root, bg=DEFAULT_BUTTON_COLOR, text=self.label, font=("Arial", 10), width=6 if self.size == "small" else 12, highlightthickness=0, border=0, command=self.onclick)
+        self.button = tk.Button(self.app.root, bg=color, text=self.label, font=("Arial", 10), width=6 if self.size == "small" else 12, highlightthickness=0, border=0, command=self.onclick)
         self.x = 0
         self.y = 0
         self.visible = True

@@ -138,49 +138,47 @@ class Algorithms:
             self.app.infobox.log("Chyba: Kruskalov algoritmus nefunguje na orientované grafy")
             return False
         
-        size = len(self.app.vertices)
         logs = []
-
         edges = []
         for edge in self.app.edges:
             v1, v2 = edge.vertices
-            edges.append((edge.weight, edge.id, v1.id - 1, v2.id - 1, v1.tag, v2.tag))
+            edges.append((edge.weight, edge.id, v1, v2))
 
-        edges.sort()
+        edges.sort(key=lambda x: x[0])
 
         logs.append("Spúštam Kruskalov algoritmus a zoraďujem si hrany od najmenšej po najväčšiu")
 
-        parent = list(range(size))
-        rank = [0] * size
+        parent = {v: v for v in self.app.vertices}
+        rank = {v: 0 for v in self.app.vertices}
 
-        def find(i):
-            if parent[i] != i:
-                parent[i] = find(parent[i])
-            return parent[i]
+        def find(vertex):
+            if parent[vertex] != vertex:
+                parent[vertex] = find(parent[vertex])
+            return parent[vertex]
         
-        def union(x, y, x_tag, y_tag, weight):
-            root_x = find(x)
-            root_y = find(y)
-            logs.append(f"Kontrola hrany medzi vrcholmi {x_tag} - {y_tag} s váhou {weight}")
+        def union(u, v, weight):
+            root_u = find(u)
+            root_v = find(v)
+            logs.append(f"Kontrola hrany medzi vrcholmi {u.tag} - {v.tag} s váhou {weight}")
 
-            if root_x == root_y:
+            if root_u == root_v:
                 logs.append("Vznikol cyklus, preskakujem")
                 return False
             
-            if rank[root_x] < rank[root_y]:
-                parent[root_x] = root_y
-            elif rank[root_x] > rank[root_y]:
-                parent[root_y] = root_x
+            if rank[root_u] < rank[root_v]:
+                parent[root_u] = root_v
+            elif rank[root_u] > rank[root_v]:
+                parent[root_v] = root_u
             else:
-                parent[root_y] = root_x
-                rank[root_x] += 1
+                parent[root_v] = root_u
+                rank[root_u] += 1
 
             logs.append("Cyklus nevznikol, pridávam ju do minimálnej kostry grafu")
             return True
         
         mst_edges = []
-        for weight, edge_id, u, v, u_tag, v_tag in edges:
-            if union(u,v, u_tag, v_tag, weight):
+        for weight, edge_id, u, v in edges:
+            if union(u,v,weight):
                 mst_edges.append(edge_id)
 
         return (mst_edges, logs)

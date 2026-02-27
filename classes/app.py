@@ -9,11 +9,10 @@ from classes.editmenu import EditMenu
 from classes.algorithms import Algorithms
 from classes.infobox import Infobox
 from classes.user_interface import UserInterface
-from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR,
-                       DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
+from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR, DEFAULT_BUTTON_COLOR,
+                       DEFAULT_DROPDOWN_BUTTON_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
 # TODO: Implement algorithm info
-# TODO: Fix disconnected graphs still calculation MST in Prim/Kruskal
 # TODO: Implement export and import to graphs
 
 class App:
@@ -38,21 +37,21 @@ class App:
         self.canvas = tk.Canvas(self.root, width=980, height=640, bg="white")
         self.canvas.place(x=280,y=50)
         self.edit_menu = EditMenu(self)
-        self.add_vertex_button = Button(self,"add_vertex","Pridať vrchol")
-        self.add_edge_button = Button(self,"add_edge", "Pridať hranu")
-        self.move_vertex_button = Button(self,"move_vertex","Posunúť vrchol")
+        self.add_vertex_button = Button(self,"add_vertex","Pridať vrchol", DEFAULT_BUTTON_COLOR)
+        self.add_edge_button = Button(self,"add_edge", "Pridať hranu", DEFAULT_BUTTON_COLOR)
+        self.move_vertex_button = Button(self,"move_vertex","Posunúť vrchol", DEFAULT_BUTTON_COLOR)
         self.top_ui = UserInterface([self.add_vertex_button, self.add_edge_button, self.move_vertex_button], 800, 20, 110)
-        self.algorithms_button = Button(self, "show_algorithms", "Algoritmy")
-        self.dijkstra_button = Button(self, "dijkstra", "Dijkstra")
-        self.prim_button = Button(self, "prim", "Prim")
-        self.kruskal_button = Button(self, "kruskal", "Kruskal")
-        self.dfs_button = Button(self, "dfs", "DFS")
-        self.bfs_button = Button(self, "bfs", "BFS")
+        self.algorithms_button = Button(self, "show_algorithms", "Algoritmy", DEFAULT_BUTTON_COLOR)
+        self.dijkstra_button = Button(self, "dijkstra", "Dijkstra", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.prim_button = Button(self, "prim", "Prim", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.kruskal_button = Button(self, "kruskal", "Kruskal", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.dfs_button = Button(self, "dfs", "DFS", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.bfs_button = Button(self, "bfs", "BFS", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.algorithm_dropdown = UserInterface([self.algorithms_button, self.dijkstra_button, self.prim_button, self.kruskal_button, self.dfs_button, self.bfs_button], 1130, 20, 24, True)
-        self.clear_infobox = Button(self, "clear_infobox", "Prečisti", "small")
-        self.previous_step = Button(self, "prev_step", "<", "small")
-        self.next_step = Button(self, "next_step", ">", "small")
-        self.bottom_ui = UserInterface([self.clear_infobox, self.previous_step, self.next_step], 45, 670, 60)
+        self.clear_infobox = Button(self, "clear_infobox", "Prečisti", DEFAULT_BUTTON_COLOR, "small")
+        self.previous_step = Button(self, "prev_step", "<", DEFAULT_BUTTON_COLOR, "small")
+        self.next_step = Button(self, "next_step", ">", DEFAULT_BUTTON_COLOR, "small")
+        self.bottom_ui = UserInterface([self.clear_infobox, self.previous_step, self.next_step], 50, 670, 60)
         self.infobox = Infobox(self, 240, 610, 20, 50)
         self.algorithms = Algorithms(self)
         self.algorithm_fill = DEFAULT_ALGORITHM_FILL
@@ -177,25 +176,34 @@ class App:
                 break
 
         if start_vertex is None:
+            self.state = None
             return
         
-        self.reset_vertices_and_edges(event)
+        nx_G = self.build_nx_graph()
+
+        if not nx.is_connected(nx_G):
+            self.infobox.log("Chyba: Graf nie je súvislý")
+            self.state = None
+            return
+    
+        try:
+            nx_mst = nx.minimum_spanning_tree(nx_G, algorithm="prim")
+        except Exception:
+            self.state = None
+            return
 
         try:
             mst_edges, logs = self.algorithms.prim(start_vertex)
         except Exception:
+            self.state = None
             return
         
         if not mst_edges:
+            self.state = None
             return
+        
+        self.reset_vertices_and_edges(None)
 
-        nx_G = self.build_nx_graph()
-        try:
-            nx_mst = nx.minimum_spanning_tree(nx_G, algorithm="prim")
-        except Exception as e:
-            self.infobox.clear()
-            self.infobox.log(f"Chyba: {str(e)}")
-            return
         nx_cost = nx_mst.size(weight="weight")
         own_cost = self.__mst_cost_self(mst_edges)
 
@@ -227,22 +235,31 @@ class App:
         
         self.clear_algorithm_state()
 
-        self.reset_vertices_and_edges(None)
-        try:
-            mst_edges, logs = self.algorithms.kruskal()
-        except Exception:
-            return
-        
-        if not mst_edges:
-            return
-        
         nx_G = self.build_nx_graph()
+
+        if not nx.is_connected(nx_G):
+            self.infobox.log("Chyba: Graf nie je súvislý")
+            self.state = None
+            return    
+
         try:
             nx_mst = nx.minimum_spanning_tree(nx_G, algorithm="prim")
         except Exception as e:
-            self.infobox.clear()
-            self.infobox.log(f"Chyba: {str(e)}")
+            self.state = None
             return
+
+        try:
+            mst_edges, logs = self.algorithms.kruskal()
+        except Exception as e:
+            self.state = None
+            return
+        
+        if not mst_edges:
+            self.state = None
+            return
+        
+        self.reset_vertices_and_edges(None)
+
         nx_cost = nx_mst.size(weight="weight")
         own_cost = self.__mst_cost_self(mst_edges)
 
@@ -258,7 +275,7 @@ class App:
 
         self.algorithm_state = {
             "steps": mst_edges,      
-            "type": "edges",     
+            "type": "edges",
             "index": len(mst_edges),       
         }
         self.__show_algorithm_steps_in_memory()
