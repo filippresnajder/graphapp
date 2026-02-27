@@ -8,13 +8,14 @@ from classes.edge import Edge
 from classes.editmenu import EditMenu
 from classes.algorithms import Algorithms
 from classes.infobox import Infobox
+from classes.user_interface import UserInterface
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR,
                        DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
 # TODO: Implement new button design
 # TODO: Implement algorithm info
-# TODO: Implement export and import to graphs
 # TODO: Fix disconnected graphs still calculation MST in Prim/Kruskal
+# TODO: Implement export and import to graphs
 
 class App:
     def __init__(self):
@@ -35,25 +36,30 @@ class App:
         self.root.title("GraphApp")
         self.root.config(background=DEFAULT_BG_COLOR)
         self.root.resizable(False, False)
+        self.canvas = tk.Canvas(self.root, width=980, height=640, bg="white")
+        self.canvas.place(x=280,y=50)
         self.edit_menu = EditMenu(self)
-        self.add_vertex_button = Button(self,"add_vertex","AV", 800, 20)
-        self.add_vertex_button = Button(self,"move_vertex","MV", 850, 20)
-        self.add_edge_button = Button(self,"add_edge", "AE", 900, 20)
-        self.dijkstra_button = Button(self, "dijkstra", "DA", 950, 20)
-        self.prim_button = Button(self, "prim", "PA", 1000, 20)
-        self.kruskal_button = Button(self, "kruskal", "KA", 1050, 20)
-        self.dfs_button = Button(self, "dfs", "DFS", 1100, 20)
-        self.bfs_button = Button(self, "bfs", "BFS", 1150, 20)
-        self.clear_infobox = Button(self, "clear_infobox", "CL", 20, 670)
-        self.previous_step = Button(self, "prev_step", "PS", 80, 670)
-        self.next_step = Button(self, "next_step", "NS", 140, 670)
-        self.infobox = Infobox(self)
+        self.add_vertex_button = Button(self,"add_vertex","Pridať vrchol")
+        self.add_edge_button = Button(self,"add_edge", "Pridať hranu")
+        self.move_vertex_button = Button(self,"move_vertex","Posunúť vrchol")
+        self.top_ui = UserInterface([self.add_vertex_button, self.add_edge_button, self.move_vertex_button], 800, 15, 110)
+        self.algorithms_button = Button(self, "show_algorithms", "Algoritmy")
+        self.dijkstra_button = Button(self, "dijkstra", "Dijkstra")
+        self.prim_button = Button(self, "prim", "Prim")
+        self.kruskal_button = Button(self, "kruskal", "Kruskal")
+        self.dfs_button = Button(self, "dfs", "DFS")
+        self.bfs_button = Button(self, "bfs", "BFS")
+        self.algorithm_dropdown = UserInterface([self.algorithms_button, self.dijkstra_button, self.prim_button, self.kruskal_button, self.dfs_button, self.bfs_button], 1130, 15, 28, True)
+        self.clear_infobox = Button(self, "clear_infobox", "Prečisti", "small")
+        self.previous_step = Button(self, "prev_step", "<", "small")
+        self.next_step = Button(self, "next_step", ">", "small")
+        self.bottom_ui = UserInterface([self.clear_infobox, self.previous_step, self.next_step], 45, 665, 60)
+        self.infobox = Infobox(self, 240, 610, 20, 50)
         self.algorithms = Algorithms(self)
         self.algorithm_fill = DEFAULT_ALGORITHM_FILL
-        self.canvas = tk.Canvas(self.root, width=980, height=610, bg="white")
-        self.canvas.place(x=280,y=80)
         self.canvas.tag_bind(VERTEX_TAG, "<Button-3>", self.edit_vertex)
         self.canvas.tag_bind(EDGE_TAG, "<Button-3>", self.edit_edge)
+        self.root.bind("<Button-1>", self.__global_click_dropdown_close, add="+")
         self.root.bind("<r>", self.reset_vertices_and_edges)
         self.root.bind("<Control-d>", self.__remove_all_objects)
         self.root.bind("<Control-MouseWheel>", self.__zoom)
@@ -103,7 +109,7 @@ class App:
     def visualize_dijkstra(self,event):
         if self.state != "dijkstra":
             return
-        
+       
         self.clear_algorithm_state()
 
         x = self.canvas.canvasx(event.x)
@@ -527,6 +533,21 @@ class App:
     
     def clear_algorithm_state(self):
         self.algorithm_state = {"steps": [], "type": None, "index": None}
+
+    def __global_click_dropdown_close(self, event):
+        if not self.algorithm_dropdown.expanded:
+            return
+        if event.widget in [b.button for b in self.algorithm_dropdown.buttons]:
+            return
+        self.algorithm_dropdown.change_dropdown_state()
+
+    def close_dropdown(self, dropdown):
+        if not dropdown or not dropdown.expanded:
+            return
+        dropdown.change_dropdown_state()
+        
+
+    
     
 
 

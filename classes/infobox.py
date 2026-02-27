@@ -1,10 +1,10 @@
 import tkinter as tk
 
 class Infobox:
-    def __init__(self, app):
+    def __init__(self, app, width, height, x, y):
         self.app = app
         self.infobox = tk.Text(self.app.root, wrap="word", font=("Arial", 8))
-        self.infobox.place(x=20, y=80, width=240, height=580)
+        self.infobox.place(x=x, y=y, width=width, height=height)
         self.infobox.config(state=tk.DISABLED)
 
     def log(self, text):
