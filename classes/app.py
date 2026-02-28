@@ -12,11 +12,10 @@ from classes.user_interface import UserInterface
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR, DEFAULT_BUTTON_COLOR,
                        DEFAULT_DROPDOWN_BUTTON_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
-# TODO: Implement algorithm info
 # TODO: Implement export and import to graphs
 
-
 # LATER TODO: Check for infobox what is written what is not etc make sure info is readable
+# LATER TODO: Write info about algorithms in algorithm info
 
 class App:
     def __init__(self):
@@ -43,18 +42,26 @@ class App:
         self.add_vertex_button = Button(self,"add_vertex","Pridať vrchol", DEFAULT_BUTTON_COLOR)
         self.add_edge_button = Button(self,"add_edge", "Pridať hranu", DEFAULT_BUTTON_COLOR)
         self.move_vertex_button = Button(self,"move_vertex","Posunúť vrchol", DEFAULT_BUTTON_COLOR)
-        self.top_ui = UserInterface([self.add_vertex_button, self.add_edge_button, self.move_vertex_button], 800, 20, 110)
+        self.top_right_ui_group = UserInterface([self.add_vertex_button, self.add_edge_button, self.move_vertex_button], 700, 20, 110)
         self.algorithms_button = Button(self, "show_algorithms", "Algoritmy", DEFAULT_BUTTON_COLOR)
         self.dijkstra_button = Button(self, "dijkstra", "Dijkstra", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.prim_button = Button(self, "prim", "Prim", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.kruskal_button = Button(self, "kruskal", "Kruskal", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.dfs_button = Button(self, "dfs", "DFS", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.bfs_button = Button(self, "bfs", "BFS", DEFAULT_DROPDOWN_BUTTON_COLOR)
-        self.algorithm_dropdown = UserInterface([self.algorithms_button, self.dijkstra_button, self.prim_button, self.kruskal_button, self.dfs_button, self.bfs_button], 1130, 20, 24, True)
-        self.clear_infobox = Button(self, "clear_infobox", "Prečisti", DEFAULT_BUTTON_COLOR, "small")
-        self.previous_step = Button(self, "prev_step", "<", DEFAULT_BUTTON_COLOR, "small")
-        self.next_step = Button(self, "next_step", ">", DEFAULT_BUTTON_COLOR, "small")
-        self.bottom_ui = UserInterface([self.clear_infobox, self.previous_step, self.next_step], 50, 670, 60)
+        self.algorithm_dropdown = UserInterface([self.algorithms_button, self.dijkstra_button, self.prim_button, self.kruskal_button, self.dfs_button, self.bfs_button], 1030, 20, 24, True)
+        self.algorithm_info_button = Button(self, "show_algorithms_info", "O algoritmoch", DEFAULT_BUTTON_COLOR)
+        self.dijkstra_info_button = Button(self, "dijkstra_info", "Dijkstra", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.prim_info_button = Button(self, "prim_info", "Prim", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.kruskal_info_button = Button(self, "kruskal_info", "Kruskal", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.dfs_info_button = Button(self, "dfs_info", "DFS", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.bfs_info_button = Button(self, "bfs_info", "BFS", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.algorithm_info_dropdown = UserInterface([self.algorithm_info_button, self.dijkstra_info_button, self.prim_info_button, self.kruskal_info_button, self.dfs_info_button, self.bfs_info_button], 1140, 20, 24, True)
+        self.clear_infobox = Button(self, "clear_infobox", "Prečisti", DEFAULT_BUTTON_COLOR, "medium")
+        self.infobox_ui_group = UserInterface([self.clear_infobox], 60, 670, 0)
+        self.previous_step = Button(self, "prev_step", "<", DEFAULT_BUTTON_COLOR, "extra_small")
+        self.next_step = Button(self, "next_step", ">", DEFAULT_BUTTON_COLOR, "extra_small")
+        self.action_arrows_ui_group = UserInterface([self.previous_step, self.next_step], 135, 670, 42)
         self.infobox = Infobox(self, 240, 610, 20, 50)
         self.algorithms = Algorithms(self)
         self.algorithm_fill = DEFAULT_ALGORITHM_FILL
@@ -554,11 +561,15 @@ class App:
         self.algorithm_state = {"steps": [], "type": None, "index": None}
 
     def __global_click_dropdown_close(self, event):
-        if not self.algorithm_dropdown.expanded:
-            return
-        if event.widget in [b.button for b in self.algorithm_dropdown.buttons]:
-            return
-        self.algorithm_dropdown.change_dropdown_state()
+        if self.algorithm_dropdown.expanded:
+            if event.widget in [b.button for b in self.algorithm_dropdown.buttons]:
+                return
+            self.algorithm_dropdown.change_dropdown_state()
+
+        if self.algorithm_info_dropdown.expanded:
+            if event.widget in [b.button for b in self.algorithm_info_dropdown.buttons]:
+                return
+            self.algorithm_info_dropdown.change_dropdown_state()
 
     def close_dropdown(self, dropdown):
         if not dropdown or not dropdown.expanded:

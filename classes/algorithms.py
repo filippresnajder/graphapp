@@ -279,6 +279,26 @@ class Algorithms:
 
         return (traversal_order, tree_edges, logs)
     
+    def dijkstra_info(self):
+        self.app.infobox.clear()
+        self.app.infobox.log("Informácie o Dijkstrovom algoritme.")
+
+    def prim_info(self):
+        self.app.infobox.clear()
+        self.app.infobox.log("Informácie o Primovom algoritme.")
+
+    def kruskal_info(self):
+        self.app.infobox.clear()
+        self.app.infobox.log("Informácie o Kruskalovom algoritme.")
+
+    def dfs_info(self):
+        self.app.infobox.clear()
+        self.app.infobox.log("Informácie o DFS algoritme.")
+
+    def bfs_info(self):
+        self.app.infobox.clear()
+        self.app.infobox.log("Informácie o BFS algoritme.")
+    
     def __is_graph_oriented(self):
         for edge in self.app.edges:
             if edge.orientation == "yes":
