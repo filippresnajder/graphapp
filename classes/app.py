@@ -1,7 +1,10 @@
 """Importovanie knižníc, ktoré použijeme."""
 import tkinter as tk
 import networkx as nx
+import json
+import re
 
+from tkinter import filedialog
 from classes.button import Button
 from classes.vertex import Vertex
 from classes.edge import Edge
@@ -12,7 +15,8 @@ from classes.user_interface import UserInterface
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR, DEFAULT_BUTTON_COLOR,
                        DEFAULT_DROPDOWN_BUTTON_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
-# TODO: Implement export and import to graphs
+# TODO: Implement 3 more algorithms 
+# TODO: Implement test section
 
 # LATER TODO: Check for infobox what is written what is not etc make sure info is readable
 # LATER TODO: Write info about algorithms in algorithm info
@@ -42,26 +46,29 @@ class App:
         self.add_vertex_button = Button(self,"add_vertex","Pridať vrchol", DEFAULT_BUTTON_COLOR)
         self.add_edge_button = Button(self,"add_edge", "Pridať hranu", DEFAULT_BUTTON_COLOR)
         self.move_vertex_button = Button(self,"move_vertex","Posunúť vrchol", DEFAULT_BUTTON_COLOR)
-        self.top_right_ui_group = UserInterface([self.add_vertex_button, self.add_edge_button, self.move_vertex_button], 700, 20, 110)
+        self.top_right_ui_group = UserInterface([self.add_vertex_button, self.add_edge_button, self.move_vertex_button], 720, 20, 110)
         self.algorithms_button = Button(self, "show_algorithms", "Algoritmy", DEFAULT_BUTTON_COLOR)
         self.dijkstra_button = Button(self, "dijkstra", "Dijkstra", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.prim_button = Button(self, "prim", "Prim", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.kruskal_button = Button(self, "kruskal", "Kruskal", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.dfs_button = Button(self, "dfs", "DFS", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.bfs_button = Button(self, "bfs", "BFS", DEFAULT_DROPDOWN_BUTTON_COLOR)
-        self.algorithm_dropdown = UserInterface([self.algorithms_button, self.dijkstra_button, self.prim_button, self.kruskal_button, self.dfs_button, self.bfs_button], 1030, 20, 24, True)
+        self.algorithm_dropdown = UserInterface([self.algorithms_button, self.dijkstra_button, self.prim_button, self.kruskal_button, self.dfs_button, self.bfs_button], 1050, 20, 24, True)
         self.algorithm_info_button = Button(self, "show_algorithms_info", "O algoritmoch", DEFAULT_BUTTON_COLOR)
         self.dijkstra_info_button = Button(self, "dijkstra_info", "Dijkstra", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.prim_info_button = Button(self, "prim_info", "Prim", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.kruskal_info_button = Button(self, "kruskal_info", "Kruskal", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.dfs_info_button = Button(self, "dfs_info", "DFS", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.bfs_info_button = Button(self, "bfs_info", "BFS", DEFAULT_DROPDOWN_BUTTON_COLOR)
-        self.algorithm_info_dropdown = UserInterface([self.algorithm_info_button, self.dijkstra_info_button, self.prim_info_button, self.kruskal_info_button, self.dfs_info_button, self.bfs_info_button], 1140, 20, 24, True)
+        self.algorithm_info_dropdown = UserInterface([self.algorithm_info_button, self.dijkstra_info_button, self.prim_info_button, self.kruskal_info_button, self.dfs_info_button, self.bfs_info_button], 1160, 20, 24, True)
         self.clear_infobox = Button(self, "clear_infobox", "Prečisti", DEFAULT_BUTTON_COLOR, "medium")
         self.infobox_ui_group = UserInterface([self.clear_infobox], 60, 670, 0)
         self.previous_step = Button(self, "prev_step", "<", DEFAULT_BUTTON_COLOR, "extra_small")
         self.next_step = Button(self, "next_step", ">", DEFAULT_BUTTON_COLOR, "extra_small")
         self.action_arrows_ui_group = UserInterface([self.previous_step, self.next_step], 135, 670, 42)
+        self.export_graph_button = Button(self, "export_graph", "Export grafu", DEFAULT_BUTTON_COLOR)
+        self.import_graph_button = Button(self, "import_graph", "Import grafu", DEFAULT_BUTTON_COLOR)
+        self.top_left_ui_group = UserInterface([self.export_graph_button, self.import_graph_button], 20, 20, 110)
         self.infobox = Infobox(self, 240, 610, 20, 50)
         self.algorithms = Algorithms(self)
         self.algorithm_fill = DEFAULT_ALGORITHM_FILL
@@ -519,16 +526,147 @@ class App:
         for vertex in self.vertices:
             vertex.update(str(vertex.tag), fill, outline, text)
 
-    def __remove_all_objects(self, event):
+    def export_graph(self):
+        data = {
+            "vertices": [],
+            "edges": []
+        }
+
+        if not self.vertices or not self.edges:
+            self.infobox.log("Chyba: Neexistuje graf, ktorý môžem exportovať")
+            return
+        
+        for vertex in self.vertices:
+            x1,y1,x2,y2 = self.canvas.coords(vertex.canvas_object_id)
+            fill_color = vertex.fill_color
+            outline_color = vertex.outline_color
+            text_color = vertex.text_color
+            tag = str(vertex.tag)
+
+            data["vertices"].append({
+                "id": vertex.id,
+                "coords": (x1, y1, x2, y2),
+                "fill_color": fill_color,
+                "outline_color": outline_color,
+                "text_color": text_color,
+                "tag": tag
+            })
+
+        for edge in self.edges:
+            fill_color = edge.line_color
+            box_color = edge.box_color
+            weight_color = edge.weight_color
+            weight = edge.weight
+            orientation = edge.orientation
+            u, v = edge.vertices
+            edge_id = edge.id
+
+            data["edges"].append({
+                "fill_color": fill_color,
+                "box_color": box_color,
+                "weight_color": weight_color,
+                "weight": weight,
+                "orientation": orientation,
+                "first_vertex": u.id,
+                "second_vertex": v.id,
+                "id": edge_id
+            })
+
+        file = filedialog.asksaveasfilename(
+            defaultextension=".json",
+            filetypes=[("JSON", "*.json")]
+        )
+
+        if not file:
+            self.infobox.log("Chyba: Nepodarilo sa exportovať graf")
+            return
+
+        with open(file, "w", encoding="utf-8") as json_file:
+            json.dump(data, json_file, indent=4) 
+
+    def import_graph(self):
+        file = filedialog.askopenfilename(
+            filetypes=[("JSON", "*.json")]
+        )
+
+        if not file:
+            self.infobox.log("Chyba: Nepodarilo sa importovať graf")
+            return 
+        
+        with open(file, "r", encoding="utf-8") as json_file:
+            data = json.load(json_file)
+
+        if not data["vertices"] or not data["edges"]:
+            self.infobox.log("Chyba: Nepodarilo sa zostaviť graf")
+            return 
+        
+        self.__remove_all_objects(None)
+        
+        vertex_id_map = {}
+        vertex_ids = set()
+
+        for vertex in data["vertices"]:
+            if not Vertex.validate(self, vertex):
+                self.infobox.log("Chyba: Neplatné údaje v JSON súbore")
+                self.__remove_all_objects(None, False)
+                return
+            x, y = vertex["coords"][0], vertex["coords"][1]
+            imported_vertex = Vertex(self, (x - (RADIUS * self.zoom), y - (RADIUS * self.zoom), x + (RADIUS * self.zoom), y + (RADIUS * self.zoom)),
+                            vertex["fill_color"], vertex["outline_color"], vertex["text_color"], DEFAULT_WIDTH)
+            imported_vertex.id = vertex["id"]
+            imported_vertex.tag = vertex["tag"]
+            self.vertices.append(imported_vertex)
+            self.canvas_id_to_vertex[imported_vertex.canvas_object_id] = imported_vertex
+            self.canvas_id_to_vertex[imported_vertex.canvas_text] = imported_vertex
+            self.canvas.itemconfig(imported_vertex.canvas_text,  text=vertex["tag"])
+            vertex_id_map[imported_vertex.id] = imported_vertex
+            vertex_ids.add(vertex["id"])
+
+        for edge in data["edges"]:
+            if not Edge.validate(self, edge, vertex_ids):
+                self.infobox.log("Chyba: Neplatné údaje v JSON súbore")
+                self.__remove_all_objects(None, False)
+                return
+            u, v = vertex_id_map[edge["first_vertex"]], vertex_id_map[edge["second_vertex"]]
+
+            imported_edge = Edge(self,
+                        edge["fill_color"],
+                        edge["box_color"],
+                        edge["weight_color"],
+                        DEFAULT_WIDTH,
+                        edge["weight"],
+                        edge["orientation"],
+                        u, v)
+            
+            imported_edge.id = edge["id"]          
+
+            self.edges.append(imported_edge)
+            u.edges.append(imported_edge)
+            v.edges.append(imported_edge)  
+            self.canvas_id_to_edge[imported_edge.canvas_object_id] = imported_edge
+            self.canvas_id_to_edge[imported_edge.canvas_text] = imported_edge
+            self.canvas_id_to_edge[imported_edge.canvas_text_bg] = imported_edge
+
+        if not self.vertices or not self.edges:
+            self.infobox.log("Chyba: Nepodarilo sa zostaviť graf")
+            return
+        
+        Vertex.identifier = max(v.id for v in self.vertices) + 1
+        Edge.identifier = max(e.id for e in self.edges) + 1
+
+        self.update_layers()
+
+    def __remove_all_objects(self, event, clear_info_box=True):
         self.canvas.delete("all")
         self.edges.clear()
         self.vertices.clear()
         self.canvas_id_to_edge.clear()
         self.canvas_id_to_vertex.clear()
-        self.infobox.clear()
         self.clear_algorithm_state()
         Vertex.identifier = 1
         Edge.identifier = 1
+        if clear_info_box:
+            self.infobox.clear()
 
     def __zoom(self, event):
         if event.delta > 0:
@@ -576,6 +714,10 @@ class App:
             return
         dropdown.change_dropdown_state()
         
+    # https://www.geeksforgeeks.org/dsa/check-if-a-given-string-is-a-valid-hexadecimal-color-code-or-not/
+    def is_valid_hexadecimal_code(self, string):
+        hexa_code = re.compile(r'^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$')
+        return bool(re.match(hexa_code, string))
 
     
     

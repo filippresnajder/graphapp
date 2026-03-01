@@ -11,6 +11,7 @@ class Infobox:
         self.infobox.config(state=tk.NORMAL)
         self.infobox.insert(tk.END, text + "\n")
         self.infobox.config(state=tk.DISABLED)
+        self.infobox.update_idletasks() 
     
     def clear(self):
         self.infobox.config(state=tk.NORMAL)

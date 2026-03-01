@@ -35,7 +35,9 @@ class Button:
             "prim_info": self.__handle_prim_info,
             "kruskal_info": self.__handle_kruskal_info,
             "dfs_info": self.__handle_dfs_info,
-            "bfs_info": self.__handle_bfs_info
+            "bfs_info": self.__handle_bfs_info,
+            "export_graph": self.__handle_export_graph,
+            "import_graph": self.__handle_import_graph
         } 
 
     def place(self, x, y):
@@ -149,3 +151,9 @@ class Button:
         self.app.algorithms.bfs_info()
         self.app.close_dropdown(self.app.algorithm_dropdown)
         self.app.close_dropdown(self.app.algorithm_info_dropdown)
+
+    def __handle_export_graph(self):
+        self.app.export_graph()
+
+    def __handle_import_graph(self):
+        self.app.import_graph()

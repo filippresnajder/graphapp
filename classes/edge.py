@@ -171,3 +171,19 @@ class Edge:
             self.canvas_text_bg
         ):
             self.app.canvas_id_to_edge.pop(cid, None)
+
+    @staticmethod
+    def validate(app, data, vertex_ids):
+        try:
+            return (
+                app.is_valid_hexadecimal_code(data["fill_color"])
+                and app.is_valid_hexadecimal_code(data["box_color"])
+                and app.is_valid_hexadecimal_code(data["weight_color"])
+                and isinstance(data["weight"], int)
+                and (data["orientation"] in ["yes", "no"])
+                and data["first_vertex"] in vertex_ids
+                and data["second_vertex"] in vertex_ids
+                and isinstance(data["id"], int)
+            )
+        except:
+            return False

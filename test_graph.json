@@ -1,0 +1,174 @@
+{
+    "vertices": [
+        {
+            "id": 1,
+            "coords": [
+                261.6860669886816,
+                162.6860669886816,
+                292.3139330113184,
+                193.3139330113184
+            ],
+            "fill_color": "#FFFFFF",
+            "outline_color": "#000000",
+            "text_color": "#000000",
+            "tag": "1"
+        },
+        {
+            "id": 2,
+            "coords": [
+                377.6860669886816,
+                317.6860669886816,
+                408.3139330113184,
+                348.3139330113184
+            ],
+            "fill_color": "#FFFFFF",
+            "outline_color": "#000000",
+            "text_color": "#000000",
+            "tag": "2"
+        },
+        {
+            "id": 3,
+            "coords": [
+                547.6860669886817,
+                257.6860669886816,
+                578.3139330113183,
+                288.3139330113184
+            ],
+            "fill_color": "#FFFFFF",
+            "outline_color": "#000000",
+            "text_color": "#000000",
+            "tag": "3"
+        },
+        {
+            "id": 4,
+            "coords": [
+                706.6860669886817,
+                389.6860669886816,
+                737.3139330113183,
+                420.3139330113184
+            ],
+            "fill_color": "#FFFFFF",
+            "outline_color": "#000000",
+            "text_color": "#000000",
+            "tag": "4"
+        },
+        {
+            "id": 5,
+            "coords": [
+                761.6860669886817,
+                198.6860669886816,
+                792.3139330113183,
+                229.3139330113184
+            ],
+            "fill_color": "#FFFFFF",
+            "outline_color": "#000000",
+            "text_color": "#000000",
+            "tag": "5"
+        },
+        {
+            "id": 6,
+            "coords": [
+                560.6860669886817,
+                114.6860669886816,
+                591.3139330113183,
+                145.3139330113184
+            ],
+            "fill_color": "#FFFFFF",
+            "outline_color": "#000000",
+            "text_color": "#000000",
+            "tag": "6"
+        }
+    ],
+    "edges": [
+        {
+            "fill_color": "#000000",
+            "box_color": "#000000",
+            "weight_color": "#000000",
+            "weight": 2,
+            "orientation": "no",
+            "first_vertex": 1,
+            "second_vertex": 2,
+            "id": 1
+        },
+        {
+            "fill_color": "#000000",
+            "box_color": "#000000",
+            "weight_color": "#000000",
+            "weight": 14,
+            "orientation": "no",
+            "first_vertex": 2,
+            "second_vertex": 3,
+            "id": 2
+        },
+        {
+            "fill_color": "#000000",
+            "box_color": "#000000",
+            "weight_color": "#000000",
+            "weight": 7,
+            "orientation": "no",
+            "first_vertex": 3,
+            "second_vertex": 4,
+            "id": 3
+        },
+        {
+            "fill_color": "#000000",
+            "box_color": "#000000",
+            "weight_color": "#000000",
+            "weight": 3,
+            "orientation": "no",
+            "first_vertex": 3,
+            "second_vertex": 6,
+            "id": 4
+        },
+        {
+            "fill_color": "#000000",
+            "box_color": "#000000",
+            "weight_color": "#000000",
+            "weight": 4,
+            "orientation": "no",
+            "first_vertex": 1,
+            "second_vertex": 6,
+            "id": 5
+        },
+        {
+            "fill_color": "#000000",
+            "box_color": "#000000",
+            "weight_color": "#000000",
+            "weight": 5,
+            "orientation": "no",
+            "first_vertex": 6,
+            "second_vertex": 5,
+            "id": 6
+        },
+        {
+            "fill_color": "#000000",
+            "box_color": "#000000",
+            "weight_color": "#000000",
+            "weight": 7,
+            "orientation": "no",
+            "first_vertex": 5,
+            "second_vertex": 4,
+            "id": 7
+        },
+        {
+            "fill_color": "#000000",
+            "box_color": "#000000",
+            "weight_color": "#000000",
+            "weight": 4,
+            "orientation": "no",
+            "first_vertex": 5,
+            "second_vertex": 3,
+            "id": 8
+        },
+        {
+            "fill_color": "#000000",
+            "box_color": "#000000",
+            "weight_color": "#000000",
+            "weight": 2,
+            "orientation": "no",
+            "first_vertex": 3,
+            "second_vertex": 1,
+            "id": 9
+        }
+    ]
+}

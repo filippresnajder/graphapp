@@ -66,3 +66,19 @@ class Vertex:
             self.app.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
             self.app.reset_vertices_and_edges(event=None)
         self.app.clear_algorithm_state()
+
+    @staticmethod
+    def validate(app, data):
+        try:
+            return (
+                isinstance(data["id"], int)
+                and isinstance(data["coords"], list)
+                and len(data["coords"]) == 4
+                and all(isinstance(coord, float) for coord in data["coords"])
+                and app.is_valid_hexadecimal_code(data["fill_color"])
+                and app.is_valid_hexadecimal_code(data["outline_color"])
+                and app.is_valid_hexadecimal_code(data["text_color"])
+                and (isinstance(data["tag"], str))
+            )
+        except:
+            return False
