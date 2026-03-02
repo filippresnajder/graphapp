@@ -15,10 +15,8 @@ from classes.user_interface import UserInterface
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR, DEFAULT_BUTTON_COLOR,
                        DEFAULT_DROPDOWN_BUTTON_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
-# TODO: Fix multigraphs incorrect offset calculations after importing JSON
 # TODO: Lepsie/Podrobnejsie krokovanie
 # TODO: Implement 4 more algorithms - Astar, FW, Hamiltonova kruznica, Eulerov tah
-
 # TODO: Implement test section
 
 # LATER TODO: Check for infobox what is written what is not etc make sure info is readable

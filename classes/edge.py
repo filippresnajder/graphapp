@@ -158,12 +158,23 @@ class Edge:
             if self in v.edges:
                 v.edges.remove(self) 
 
-        for e in self.app.edges:
-            if (e.vertices == self.vertices and
-                e.curve_offset > self.curve_offset 
-            ):
-                e.curve_offset -= 50 if e.vertices[0] != e.vertices[1] else 25
-                e.update_position()
+        if self.curve_offset == 0:
+            parallel = [e for e in self.app.edges if set(self.vertices) == set(e.vertices)]
+            if parallel:
+                new_straight = min(parallel, key=lambda e: e.id)
+                new_straight.curve_offset = 0
+                new_straight.update_position()
+                group = [e for e in self.app.edges if e.vertices == new_straight.vertices]
+                for edge in group:
+                    if edge != new_straight:
+                        edge.curve_offset -= 50 if edge.vertices[0] != edge.vertices[1] else 25
+                        edge.update_position()
+        else:
+            for e in self.app.edges: 
+                if (e.vertices == self.vertices 
+                    and e.curve_offset > self.curve_offset): 
+                    e.curve_offset -= 50 if e.vertices[0] != e.vertices[1] else 25 
+                    e.update_position()
 
         for cid in (
             self.canvas_object_id,
