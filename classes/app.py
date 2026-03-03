@@ -15,8 +15,8 @@ from classes.user_interface import UserInterface
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR, DEFAULT_BUTTON_COLOR,
                        DEFAULT_DROPDOWN_BUTTON_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
+# TODO: Implement 3 more algorithms - FW, Hamiltonova cesta, Eulerov tah
 # TODO: Lepsie/Podrobnejsie krokovanie
-# TODO: Implement 4 more algorithms - Astar, FW, Hamiltonova kruznica, Eulerov tah
 # TODO: Implement test section
 
 # LATER TODO: Check for infobox what is written what is not etc make sure info is readable
@@ -56,14 +56,36 @@ class App:
         self.kruskal_button = Button(self, "kruskal", "Kruskal", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.dfs_button = Button(self, "dfs", "DFS", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.bfs_button = Button(self, "bfs", "BFS", DEFAULT_DROPDOWN_BUTTON_COLOR)
-        self.algorithm_dropdown = UserInterface([self.algorithms_button, self.dijkstra_button, self.prim_button, self.kruskal_button, self.dfs_button, self.bfs_button], 1050, 20, 24, True)
+        self.floyd_warshall_button = Button(self, "floyd_warshall", "Floyd-Warshall", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.hamilton_cycle_button = Button(self, "hamilton_cycle", "Hamilt. kružnica", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.euler_path_button = Button(self, "euler_path", "Eulerov ťah", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.algorithm_dropdown = UserInterface([self.algorithms_button, 
+                                                 self.dijkstra_button, 
+                                                 self.prim_button, 
+                                                 self.kruskal_button, 
+                                                 self.dfs_button, 
+                                                 self.bfs_button,
+                                                 self.floyd_warshall_button,
+                                                 self.hamilton_cycle_button,
+                                                 self.euler_path_button], 1050, 20, 24, True)
         self.algorithm_info_button = Button(self, "show_algorithms_info", "O algoritmoch", DEFAULT_BUTTON_COLOR)
         self.dijkstra_info_button = Button(self, "dijkstra_info", "Dijkstra", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.prim_info_button = Button(self, "prim_info", "Prim", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.kruskal_info_button = Button(self, "kruskal_info", "Kruskal", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.dfs_info_button = Button(self, "dfs_info", "DFS", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.bfs_info_button = Button(self, "bfs_info", "BFS", DEFAULT_DROPDOWN_BUTTON_COLOR)
-        self.algorithm_info_dropdown = UserInterface([self.algorithm_info_button, self.dijkstra_info_button, self.prim_info_button, self.kruskal_info_button, self.dfs_info_button, self.bfs_info_button], 1160, 20, 24, True)
+        self.floyd_warshall_info_button = Button(self, "floyd_warshall_info", "Floyd-Warshall", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.hamilton_cycle_info_button = Button(self, "hamilton_cycle_info", "Hamilt. kružnica", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.euler_path_info_button = Button(self, "euler_path_info", "Eulerov ťah", DEFAULT_DROPDOWN_BUTTON_COLOR)
+        self.algorithm_info_dropdown = UserInterface([self.algorithm_info_button, 
+                                                           self.dijkstra_info_button, 
+                                                           self.prim_info_button, 
+                                                           self.kruskal_info_button, 
+                                                           self.dfs_info_button, 
+                                                           self.bfs_info_button,
+                                                           self.floyd_warshall_info_button,
+                                                           self.hamilton_cycle_info_button,
+                                                           self.euler_path_info_button], 1160, 20, 24, True)
         self.clear_infobox = Button(self, "clear_infobox", "Prečisti", DEFAULT_BUTTON_COLOR, "medium")
         self.infobox_ui_group = UserInterface([self.clear_infobox], 60, 670, 0)
         self.previous_step = Button(self, "prev_step", "<", DEFAULT_BUTTON_COLOR, "extra_small")

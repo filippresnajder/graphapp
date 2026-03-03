@@ -26,6 +26,9 @@ class Button:
             "kruskal": self.__handle_kruskal,
             "dfs": self.__handle_dfs,
             "bfs": self.__handle_bfs,
+            "floyd_warshall": self.__handle_floyd_warshall,
+            "hamilton_cycle": self.__handle_hamilton_cycle,
+            "euler_path": self.__handle_euler_path,
             "clear_infobox": self.__handle_clear_infobox,
             "prev_step": self.__handle_prev_step,
             "next_step": self.__handle_next_step,
@@ -36,8 +39,11 @@ class Button:
             "kruskal_info": self.__handle_kruskal_info,
             "dfs_info": self.__handle_dfs_info,
             "bfs_info": self.__handle_bfs_info,
+            "floyd_warshall_info": self.__handle_floyd_warshall_info,
+            "hamilton_cycle_info": self.__handle_hamilton_cycle_info,
+            "euler_path_info": self.__handle_euler_path_info,
             "export_graph": self.__handle_export_graph,
-            "import_graph": self.__handle_import_graph
+            "import_graph": self.__handle_import_graph,
         } 
 
     def place(self, x, y):
@@ -112,6 +118,21 @@ class Button:
         self.app.close_dropdown(self.app.algorithm_dropdown)
         self.app.close_dropdown(self.app.algorithm_info_dropdown)
 
+    def __handle_floyd_warshall(self):
+        print("FW algo")
+        self.app.close_dropdown(self.app.algorithm_dropdown)
+        self.app.close_dropdown(self.app.algorithm_info_dropdown)
+
+    def __handle_hamilton_cycle(self):
+        print("Hamilton cycle algo")
+        self.app.close_dropdown(self.app.algorithm_dropdown)
+        self.app.close_dropdown(self.app.algorithm_info_dropdown)
+
+    def __handle_euler_path(self):
+        print("Euler path algo")
+        self.app.close_dropdown(self.app.algorithm_dropdown)
+        self.app.close_dropdown(self.app.algorithm_info_dropdown)
+
     def __handle_clear_infobox(self):
         self.app.infobox.clear()
 
@@ -149,6 +170,21 @@ class Button:
 
     def __handle_bfs_info(self):
         self.app.algorithms.bfs_info()
+        self.app.close_dropdown(self.app.algorithm_dropdown)
+        self.app.close_dropdown(self.app.algorithm_info_dropdown)
+
+    def __handle_floyd_warshall_info(self):
+        self.app.algorithms.floyd_warshall_info()
+        self.app.close_dropdown(self.app.algorithm_dropdown)
+        self.app.close_dropdown(self.app.algorithm_info_dropdown)
+
+    def __handle_hamilton_cycle_info(self):
+        self.app.algorithms.hamilton_cycle_info()
+        self.app.close_dropdown(self.app.algorithm_dropdown)
+        self.app.close_dropdown(self.app.algorithm_info_dropdown)
+
+    def __handle_euler_path_info(self):
+        self.app.algorithms.euler_path_info()
         self.app.close_dropdown(self.app.algorithm_dropdown)
         self.app.close_dropdown(self.app.algorithm_info_dropdown)
 

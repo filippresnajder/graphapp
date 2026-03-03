@@ -278,6 +278,15 @@ class Algorithms:
         dfs_visit(start_vertex)
 
         return (traversal_order, tree_edges, logs)
+
+    def floyd_warshall(self):
+        pass
+
+    def hamilton_cycle(self):
+        pass
+
+    def euler_path(self):
+        pass
     
     def dijkstra_info(self):
         self.app.infobox.clear()
@@ -298,6 +307,23 @@ class Algorithms:
     def bfs_info(self):
         self.app.infobox.clear()
         self.app.infobox.log("Informácie o BFS algoritme.")
+
+    def a_star_info(self):
+        self.app.infobox.clear()
+        self.app.infobox.log("Informácie o A Star algoritme.")
+
+    def floyd_warshall_info(self):
+        self.app.infobox.clear()
+        self.app.infobox.log("Informácie o Floyd-Warshallovom algoritme.")
+
+    def hamilton_cycle_info(self):
+        self.app.infobox.clear()
+        self.app.infobox.log("Informácie o Hamiltonovej kružnici.")
+
+    def euler_path_info(self):
+        self.app.infobox.clear()
+        self.app.infobox.log("Informácie o Eulerovom ťahu.")
+
     
     def __is_graph_oriented(self):
         for edge in self.app.edges:
