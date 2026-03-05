@@ -7,6 +7,7 @@ class Algorithms:
     
     def dijkstra(self, start_vertex, end_vertex):
         self.app.infobox.clear()
+        self.app.infobox.log("Spúšťam vizualizáciu Dijkstrovho algoritmu")
 
         if self.__contains_negative_weight():
             self.app.infobox.log("Chyba: Dijkstrov algoritmus nie je možné spusiť v grafe so zápornými hranami")
@@ -126,6 +127,7 @@ class Algorithms:
     
     def prim(self, start_vertex):
         self.app.infobox.clear()
+        self.app.infobox.log("Spúšťam vizualizáciu Primovho algoritmu")
 
         if self.__is_graph_oriented():
             self.app.infobox.log("Chyba: Primov algoritmus nefunguje na orientované grafy")
@@ -133,44 +135,75 @@ class Algorithms:
 
         visited = set()
         mst_edges = []
+        cyclic_edges = []
         pq = []
-        visited_edges = []
+
         logs = []
-        logs.append(f"Spúštam Primov algoritmus od vrcholu {start_vertex.tag}")
-        logs.append(f"Vrchol {start_vertex.tag} pridávam do minimálnej kostry")
+        vertex_logs = []
+        edges_logs = []
+
+        first_log = f"Spúštam Primov algoritmus od vrcholu {start_vertex.tag}"
+        second_log = f"Vrchol {start_vertex.tag} pridávam do minimálnej kostry"
+        logs.append([first_log, second_log])
+        vertex_logs.append({start_vertex: True})
+        edges_logs.append({})
         visited.add(start_vertex)
 
         counter = 0
-
         for edge in start_vertex.edges:
             v1, v2 = edge.vertices
             neighbour = v2 if v1 == start_vertex else v1
             heapq.heappush(pq, (edge.weight, counter, start_vertex, neighbour, edge))
             counter += 1
 
+        mst_cost = 0
         while pq:
-            weight, _, u, v, edge = heapq.heappop(pq)
+            steps_log = []
+            weight, _, previous_vertex, current_vertex, edge = heapq.heappop(pq)
 
-            logs.append(f"Kontrolujem hranu ({u.tag} - {v.tag}) s váhou {weight}")
+            steps_log.append(f"Z navštívených vrcholov vyberám hranu s najmenšou váhou {weight} medzi vrcholmi {previous_vertex.tag} a {current_vertex.tag}")
 
-            if v in visited:
-                logs.append("Vrchol už patrí do minimálnej kostry, preskakujem")
+            if current_vertex in visited:
+                cyclic_edges.append(edge)
+                steps_log.append("Vzniká cyklus, danú hranu nepridávam do minimálnej kostry grafu")
+                logs.append(steps_log)
+                mst = {e: True for e in mst_edges}
+                cyclic = {e: False for e in cyclic_edges}
+                merged = mst | cyclic
+                edges_logs.append(merged)
+                vertex_logs.append({v: True for v in visited})
                 continue
 
-            visited.add(v)
-            mst_edges.append(edge.id)
-            logs.append("Vrchol a hranu pridávam do minimálnej kostry")
-            visited_edges.append(edge)
+            visited.add(current_vertex)
+            mst_edges.append(edge)
+            mst_cost += weight
 
-            for edge in v.edges:
+            steps_log.append(f"Vrchol {current_vertex.tag} ešte nebol navštívený, pridávam ho do minimálnej kostry grafu")
+            steps_log.append(f"Momentálna váha minimálnej kostry grafu je {mst_cost}")
+            logs.append(steps_log)
+            mst = {e: True for e in mst_edges}
+            cyclic = {e: False for e in cyclic_edges}
+            merged = mst | cyclic
+            edges_logs.append(merged)
+            vertex_logs.append({v: True for v in visited})
+
+            for edge in current_vertex.edges:
                 v1, v2 = edge.vertices
-                neighbour = v2 if v1 == v else v1
+                neighbour = v2 if v1 == current_vertex else v1
 
                 if neighbour not in visited:
-                    heapq.heappush(pq, (edge.weight, counter, v, neighbour, edge))
+                    heapq.heappush(pq, (edge.weight, counter, current_vertex, neighbour, edge))
                     counter += 1
 
-        return (mst_edges, logs)
+        final_step_logs = []
+        final_step_logs.append("Všetky vrcholy boli navštívené, hrany tvoriace minimálnu kostru sú zvýraznené")
+        final_step_logs.append(f"Celková cena minimálnej kostry grafu je {mst_cost}")
+
+        logs.append(final_step_logs)
+        edges_logs.append({e: True for e in mst_edges})
+        vertex_logs.append({v: True for v in visited})
+
+        return (mst_edges, mst_cost, logs, edges_logs, vertex_logs)
     
     def kruskal(self):
         self.app.infobox.clear()

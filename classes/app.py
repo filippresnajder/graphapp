@@ -33,7 +33,7 @@ class App:
         self.edges = []
         self.algorithm_state = {
             "index": None,
-            "logs": []
+            "steps": []
         }
         self.canvas_id_to_vertex = {}
         self.canvas_id_to_edge = {}
@@ -120,7 +120,7 @@ class App:
         self.canvas_id_to_vertex[vertex.canvas_object_id] = vertex
         self.canvas_id_to_vertex[vertex.canvas_text] = vertex
 
-        if (self.algorithm_state["logs"]):
+        if (self.algorithm_state["steps"]):
             self.infobox.clear()
             self.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
             self.reset_vertices_and_edges(event=None)
@@ -142,7 +142,7 @@ class App:
 
         self.edit_menu.render_add_edge_menu(event, start_vertex, end_vertex)
 
-        if (self.algorithm_state["logs"]):
+        if (self.algorithm_state["steps"]):
             self.infobox.clear()
             self.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
             self.reset_vertices_and_edges(event=None)
@@ -151,7 +151,7 @@ class App:
     def visualize_dijkstra(self,event):
         if self.state != "dijkstra":
             return
-       
+        
         self.clear_algorithm_state()
 
         x = self.canvas.canvasx(event.x)
@@ -179,7 +179,6 @@ class App:
             self.infobox.log(f"Chyba: {str(e)}")
             return
         
-        self.infobox.log("Spúšťam vizualizáciu Dijkstrovho algoritmu")
         self.infobox.log("Algoritmus úspešne prebehol")
         self.infobox.log("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
 
@@ -199,9 +198,9 @@ class App:
             self.canvas.itemconfig(v1.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
             self.canvas.itemconfig(v2.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
 
-        self.algorithm_state = { 
+        self.algorithm_state = {
             "index": -1, 
-            "logs": {"logs": logs,
+            "steps": {"logs": logs,
                      "edges": edge_logs,
                      "vertices": vertices_logs}    
         }
@@ -240,11 +239,7 @@ class App:
             self.state = None
             return
 
-        try:
-            mst_edges, logs = self.algorithms.prim(start_vertex)
-        except Exception:
-            self.state = None
-            return
+        mst_edges, mst_cost, logs, edge_logs, vertices_logs = self.algorithms.prim(start_vertex)
         
         if not mst_edges:
             self.state = None
@@ -252,28 +247,28 @@ class App:
         
         self.reset_vertices_and_edges(None)
 
-        nx_cost = nx_mst.size(weight="weight")
-        own_cost = self.__mst_cost_self(mst_edges)
+        self.infobox.log("Algoritmus úspešne prebehol")
+        self.infobox.log("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
 
-        logs.append("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
-        if (nx_cost != own_cost):
+        nx_mst_cost = nx_mst.size(weight="weight")
+        if (nx_mst_cost != mst_cost):
             self.infobox.log("Chyba: Test medzi vlastným algoritmom a NetworkX algoritmom zlyhal")
-            self.infobox.log(f"Váha NetworkX: {nx_cost}")
-            self.infobox.log(f"Váha Vlastného algoritmu: {own_cost}")
+            self.infobox.log(f"Váha NetworkX: {nx_mst_cost}")
+            self.infobox.log(f"Váha Vlastného algoritmu: {mst_cost}")
             return
 
-        logs.append(f"Výsledky sedia - kostra bola vytvorená, celková váha je {own_cost}")
-        logs.append("Ukončujem algoritmus\n")  
+        self.infobox.log(f"Výsledky sedia - kostra bola vytvorená, celková váha je {mst_cost}")
+        self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu.")
 
         self.algorithm_state = {
-            "steps": mst_edges,      
-            "type": "edges",     
-            "index": len(mst_edges),       
+            "index": -1, 
+            "steps": {"logs": logs,
+                     "edges": edge_logs,
+                     "vertices": vertices_logs}    
         }
-        self.__show_algorithm_steps_in_memory()
 
-        for data in logs:
-            self.algorithm_state["logs"].append(data)
+        for edge in mst_edges:
+            self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
 
         self.state = None
 
@@ -509,7 +504,7 @@ class App:
         return G
     
     def show_algorithm_step(self, go_to_next_step):
-        if not self.algorithm_state["logs"]:
+        if not self.algorithm_state["steps"]:
             return
         
         if self.algorithm_state["index"] is None:
@@ -518,7 +513,7 @@ class App:
         
         self.algorithm_state["index"] += 1 if go_to_next_step else -1
 
-        if self.algorithm_state["index"] < 0 or self.algorithm_state["index"] > len(self.algorithm_state["logs"]["logs"])-1:
+        if self.algorithm_state["index"] < 0 or self.algorithm_state["index"] > len(self.algorithm_state["steps"]["logs"])-1:
             self.algorithm_state["index"] = 0
 
         self.infobox.clear()
@@ -527,20 +522,20 @@ class App:
     def __show_algorithm_steps_in_memory(self):
         self.reset_vertices_and_edges(event=None)
 
-        if not self.algorithm_state["logs"]:
+        if not self.algorithm_state["steps"]:
             return
 
-        for data in self.algorithm_state["logs"]["logs"][self.algorithm_state["index"]]:
+        for data in self.algorithm_state["steps"]["logs"][self.algorithm_state["index"]]:
             self.infobox.log(data)
 
-        edges = self.algorithm_state["logs"]["edges"][self.algorithm_state["index"]]
+        edges = self.algorithm_state["steps"]["edges"][self.algorithm_state["index"]]
         for edge, state in edges.items():
             if state:
                 self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
             else:
                 self.canvas.itemconfig(edge.canvas_object_id, fill="red")
 
-        vertices = self.algorithm_state["logs"]["vertices"][self.algorithm_state["index"]]
+        vertices = self.algorithm_state["steps"]["vertices"][self.algorithm_state["index"]]
         for vertex, state in vertices.items():
             if state:
                 self.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
@@ -725,14 +720,10 @@ class App:
             edge.update_position()
     
     def __mst_cost_self(self, edges):
-        cost = 0
-        for edge in self.edges:
-            if edge.id in edges:
-                cost += edge.weight
-        return cost
+        return sum(e.weight for e in edges)
     
     def clear_algorithm_state(self):
-        self.algorithm_state = {"index": None, "logs": []}
+        self.algorithm_state = {"index": None, "steps": []}
 
     def __global_click_dropdown_close(self, event):
         if self.algorithm_dropdown.expanded:
