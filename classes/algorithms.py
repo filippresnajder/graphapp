@@ -13,30 +13,36 @@ class Algorithms:
             return False
         
         logs = []
-        logs.append("Spúštam Dijkstrov algoritmus")
-        logs.append(f"Začínam na vrchole {start_vertex.tag}")
+        edges_logs = []
+        vertices_logs = []
 
         distances = {v: float("inf") for v in self.app.vertices}
-        logs.append("Inicializujem vzdialenosti pre vrcholy na nekonečno")
         previous = {}
-        edges_visited = []
+        vertices_checked = set()
+        edges_visited = set()
         distances[start_vertex] = 0
-        logs.append(f"Pre počiatočný vrchol {start_vertex.tag} nastavujem vzdialenosť 0")
 
         pq = [(0, start_vertex.id, start_vertex)]
 
         while pq:
+            step_log = []
+            edges = {}
             current_dist, _, current = heapq.heappop(pq)
 
             if current_dist > distances[current]:
                 continue
 
-            logs.append(f"Vyberám vrchol {current.tag} s aktuálnou vzdialenosťou {current_dist}")
+            step_log.append(f"Vyberám ešte neprehľadaný vrchol, s aktuálne najmenšou vzdialenosťou (Vrchol {current.tag}, aktuálna vzdialenosť {current_dist})")
             if current == end_vertex:
-                logs.append(f"Navštívil som konečný vrchol {end_vertex.tag}, začínam rekonštrukciu cesty")
+                step_log.append(f"Navštívený vrchol {end_vertex.tag} je konečný vrchol")
+                step_log.append("Môžem začať rekonštrukciu cesty")
+                logs.append(step_log)
+                edges_logs.append({})
+                vertices_logs.append({current: True})
                 break
 
-            for edge in current.edges:
+            step_log.append(f"Skúmam nenavštívené hrany zoradené podľa váhy pre aktuálny vrchol {current.tag}")
+            for edge in sorted(current.edges, key=lambda e: e.weight):
                 v1, v2, = edge.vertices
 
                 if edge.orientation == "yes":
@@ -47,7 +53,7 @@ class Algorithms:
                     neighbour = v2 if v1 == current else v1
 
                 if edge not in edges_visited:
-                    logs.append(f"Skúmam hranu {current.tag} -> {neighbour.tag} (váha {edge.weight})")
+                    step_log.append(f"Skúmam hranu {current.tag} -> {neighbour.tag} (váha {edge.weight})")
 
                 new_dist = current_dist + edge.weight
 
@@ -55,33 +61,68 @@ class Algorithms:
                     distances[neighbour] = new_dist
                     previous[neighbour] = (current, edge)
                     heapq.heappush(pq, (new_dist, neighbour.id, neighbour))
-                    logs.append(f"Našla sa kratšia vzdialenosť - aktualizujem vzdialenosť do vrcholu {neighbour.tag} na hodnotu {new_dist}")
+                    step_log.append(f"Našla sa kratšia vzdialenosť - aktualizujem vzdialenosť do vrcholu {neighbour.tag} na hodnotu {new_dist}")
+                    edges[edge] = True
                 else:
                     if edge not in edges_visited:
-                        logs.append(f"Neaktualizujem vrchol {neighbour.tag} - aktuálna vzdialenosť je kratšia.")
+                        step_log.append(f"Neaktualizujem vrchol {neighbour.tag} - jeho aktuálna vzdialenosť {distances[neighbour]} je menšia ako vypočítaná {new_dist}.")
+                        edges[edge] = False
                 
-                edges_visited.append(edge)
+                edges_visited.add(edge)
 
+            vertices_checked.add(current)
+
+            step_log.append("")
+            step_log.append("Momentálne najkratšie vzdialenosti do vrcholov po tomto kroku:")
+            for v, d in distances.items():
+                step_log.append(f"Vrchol {v.tag} {'(navštívený)' if v in vertices_checked else ''} = {('nekonečno' if d == float('inf') else d)}")
+
+            step_log.append("")
+            step_log.append("Zoznam predošlých vrchlov pre jednotlivé vrcholy:")
+            for v, d in previous.items():
+                step_log.append(f"Vrchol {v.tag} = {d[0].tag}")
+
+            logs.append(step_log)
+            edges_logs.append(edges)
+            vertices_logs.append({current: True})
 
         if end_vertex not in previous and end_vertex != start_vertex:
             return None
-        
+
         path = []
         path_tag = []
-        edge_ids = []
+        edge_objects = set()
         current = end_vertex
+        edges = {}
+        vertices = {current: True}
 
         while current != start_vertex:
+            step_log = []
+            step_log.append("Zoznam predošlých vrchlov pre jednotlivé vrcholy:")
+            for v, d in previous.items():
+                step_log.append(f"Vrchol {v.tag} = {d[0].tag}")
             path.insert(0, current.id)
             path_tag.insert(0, current.tag)
             prev_vertex, prev_edge = previous[current]
-            edge_ids.insert(0, prev_edge.id)
+            vertices[prev_vertex] = True
+            edges[prev_edge] = True
+            step_log.append(f"\nDo vrcholu {current.tag} vedie najvýhodnejšia cesta z vrcholu {prev_vertex.tag} hranou s váhou {prev_edge.weight}, vrchol a hranu pridávam do cesty")
+            logs.append(step_log)
+            vertices_logs.append(vertices.copy())
+            edges_logs.append(edges.copy())
+            edge_objects.add(prev_edge)
             current = prev_vertex
 
         path.insert(0, start_vertex.id)
         path_tag.insert(0, start_vertex.tag)
+        step_logs = []
+        step_logs.append(f"Vrchol {start_vertex.tag} je počiatočný vrchol, ukončujem rekonštrukciu cesty a algoritmus")
+        step_logs.append(f"Najkratšia cesta: {path_tag}")
+        logs.append(step_logs)
+        edges_logs.append(edges)
+        vertices_logs.append(vertices)
 
-        return (path, edge_ids, path_tag, logs)
+        return (path, path_tag, edge_objects, logs, edges_logs, vertices_logs)
     
     def prim(self, start_vertex):
         self.app.infobox.clear()

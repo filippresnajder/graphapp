@@ -32,9 +32,8 @@ class App:
         self.vertices = []
         self.edges = []
         self.algorithm_state = {
-            "steps": [],
-            "type": None,
             "index": None,
+            "logs": []
         }
         self.canvas_id_to_vertex = {}
         self.canvas_id_to_edge = {}
@@ -49,7 +48,9 @@ class App:
         self.add_vertex_button = Button(self,"add_vertex","Pridať vrchol", DEFAULT_BUTTON_COLOR)
         self.add_edge_button = Button(self,"add_edge", "Pridať hranu", DEFAULT_BUTTON_COLOR)
         self.move_vertex_button = Button(self,"move_vertex","Posunúť vrchol", DEFAULT_BUTTON_COLOR)
-        self.top_right_ui_group = UserInterface([self.add_vertex_button, self.add_edge_button, self.move_vertex_button], 720, 20, 110)
+        self.top_right_ui_group = UserInterface([self.add_vertex_button,
+                                                self.add_edge_button,
+                                                self.move_vertex_button], 720, 20, 110)
         self.algorithms_button = Button(self, "show_algorithms", "Algoritmy", DEFAULT_BUTTON_COLOR)
         self.dijkstra_button = Button(self, "dijkstra", "Dijkstra", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.prim_button = Button(self, "prim", "Prim", DEFAULT_DROPDOWN_BUTTON_COLOR)
@@ -59,11 +60,11 @@ class App:
         self.floyd_warshall_button = Button(self, "floyd_warshall", "Floyd-Warshall", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.hamilton_cycle_button = Button(self, "hamilton_cycle", "Hamilt. kružnica", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.euler_path_button = Button(self, "euler_path", "Eulerov ťah", DEFAULT_DROPDOWN_BUTTON_COLOR)
-        self.algorithm_dropdown = UserInterface([self.algorithms_button, 
-                                                 self.dijkstra_button, 
-                                                 self.prim_button, 
-                                                 self.kruskal_button, 
-                                                 self.dfs_button, 
+        self.algorithm_dropdown = UserInterface([self.algorithms_button,
+                                                 self.dijkstra_button,
+                                                 self.prim_button,
+                                                 self.kruskal_button,
+                                                 self.dfs_button,
                                                  self.bfs_button,
                                                  self.floyd_warshall_button,
                                                  self.hamilton_cycle_button,
@@ -77,15 +78,15 @@ class App:
         self.floyd_warshall_info_button = Button(self, "floyd_warshall_info", "Floyd-Warshall", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.hamilton_cycle_info_button = Button(self, "hamilton_cycle_info", "Hamilt. kružnica", DEFAULT_DROPDOWN_BUTTON_COLOR)
         self.euler_path_info_button = Button(self, "euler_path_info", "Eulerov ťah", DEFAULT_DROPDOWN_BUTTON_COLOR)
-        self.algorithm_info_dropdown = UserInterface([self.algorithm_info_button, 
-                                                           self.dijkstra_info_button, 
-                                                           self.prim_info_button, 
-                                                           self.kruskal_info_button, 
-                                                           self.dfs_info_button, 
-                                                           self.bfs_info_button,
-                                                           self.floyd_warshall_info_button,
-                                                           self.hamilton_cycle_info_button,
-                                                           self.euler_path_info_button], 1160, 20, 24, True)
+        self.algorithm_info_dropdown = UserInterface([self.algorithm_info_button,
+                                                      self.dijkstra_info_button,
+                                                      self.prim_info_button,
+                                                      self.kruskal_info_button,
+                                                      self.dfs_info_button,
+                                                      self.bfs_info_button,
+                                                      self.floyd_warshall_info_button,
+                                                      self.hamilton_cycle_info_button,
+                                                      self.euler_path_info_button], 1160, 20, 24, True)
         self.clear_infobox = Button(self, "clear_infobox", "Prečisti", DEFAULT_BUTTON_COLOR, "medium")
         self.infobox_ui_group = UserInterface([self.clear_infobox], 60, 670, 0)
         self.previous_step = Button(self, "prev_step", "<", DEFAULT_BUTTON_COLOR, "extra_small")
@@ -93,7 +94,8 @@ class App:
         self.action_arrows_ui_group = UserInterface([self.previous_step, self.next_step], 135, 670, 42)
         self.export_graph_button = Button(self, "export_graph", "Export grafu", DEFAULT_BUTTON_COLOR)
         self.import_graph_button = Button(self, "import_graph", "Import grafu", DEFAULT_BUTTON_COLOR)
-        self.top_left_ui_group = UserInterface([self.export_graph_button, self.import_graph_button], 20, 20, 110)
+        self.top_left_ui_group = UserInterface([self.export_graph_button,
+                                                self.import_graph_button], 20, 20, 110)
         self.infobox = Infobox(self, 240, 610, 20, 50)
         self.algorithms = Algorithms(self)
         self.algorithm_fill = DEFAULT_ALGORITHM_FILL
@@ -118,7 +120,7 @@ class App:
         self.canvas_id_to_vertex[vertex.canvas_object_id] = vertex
         self.canvas_id_to_vertex[vertex.canvas_text] = vertex
 
-        if (self.algorithm_state["steps"]):
+        if (self.algorithm_state["logs"]):
             self.infobox.clear()
             self.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
             self.reset_vertices_and_edges(event=None)
@@ -140,7 +142,7 @@ class App:
 
         self.edit_menu.render_add_edge_menu(event, start_vertex, end_vertex)
 
-        if (self.algorithm_state["steps"]):
+        if (self.algorithm_state["logs"]):
             self.infobox.clear()
             self.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
             self.reset_vertices_and_edges(event=None)
@@ -168,7 +170,7 @@ class App:
         if not own_result:
             return
 
-        own_res, edge_ids, path_tag, logs = own_result
+        own_res, path_tag, edge_objects, logs, edge_logs, vertices_logs = own_result
 
         try:
             nx_res = nx.dijkstra_path(nx_G, start_vertex.id, end_vertex.id)
@@ -176,8 +178,10 @@ class App:
             self.infobox.clear()
             self.infobox.log(f"Chyba: {str(e)}")
             return
-
-        logs.append("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
+        
+        self.infobox.log("Spúšťam vizualizáciu Dijkstrovho algoritmu")
+        self.infobox.log("Algoritmus úspešne prebehol")
+        self.infobox.log("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
 
         if nx_res != own_res:
             self.infobox.clear()
@@ -186,19 +190,21 @@ class App:
             self.infobox.log(f"Vlastný výsledok: {own_res}")
             return
         
-        logs.append(f"Výsledky sedia - cesta {path_tag}")
-        logs.append("Ukončujem algoritmus")
+        self.infobox.log(f"Výsledky sedia - cesta {path_tag}")
+        self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu.")
 
+        for edge in edge_objects:
+            v1, v2 = edge.vertices
+            self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+            self.canvas.itemconfig(v1.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+            self.canvas.itemconfig(v2.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
 
-        self.algorithm_state = {
-            "steps": edge_ids,      
-            "type": "edges",     
-            "index": len(edge_ids),       
+        self.algorithm_state = { 
+            "index": -1, 
+            "logs": {"logs": logs,
+                     "edges": edge_logs,
+                     "vertices": vertices_logs}    
         }
-        self.__show_algorithm_steps_in_memory()  
-
-        for data in logs:
-            self.infobox.log(data)  
 
         self.state = None
 
@@ -267,7 +273,7 @@ class App:
         self.__show_algorithm_steps_in_memory()
 
         for data in logs:
-            self.infobox.log(data)  
+            self.algorithm_state["logs"].append(data)
 
         self.state = None
 
@@ -503,7 +509,7 @@ class App:
         return G
     
     def show_algorithm_step(self, go_to_next_step):
-        if not self.algorithm_state["steps"]:
+        if not self.algorithm_state["logs"]:
             return
         
         if self.algorithm_state["index"] is None:
@@ -512,29 +518,34 @@ class App:
         
         self.algorithm_state["index"] += 1 if go_to_next_step else -1
 
-        if self.algorithm_state["index"] < 0 or self.algorithm_state["index"] > len(self.algorithm_state["steps"]):
+        if self.algorithm_state["index"] < 0 or self.algorithm_state["index"] > len(self.algorithm_state["logs"]["logs"])-1:
             self.algorithm_state["index"] = 0
 
+        self.infobox.clear()
         self.__show_algorithm_steps_in_memory()
 
     def __show_algorithm_steps_in_memory(self):
         self.reset_vertices_and_edges(event=None)
 
-        if not self.algorithm_state["steps"] or self.algorithm_state["type"] is None:
+        if not self.algorithm_state["logs"]:
             return
 
-        if self.algorithm_state["type"] == "edges":
-            for edge in self.edges:
-                if edge.id in self.algorithm_state["steps"][:self.algorithm_state["index"]]:
-                    self.canvas.itemconfig(edge.canvas_object_id, fill=self.algorithm_fill)
-        elif self.algorithm_state["type"] == "vertices":
-            for index, vertex_id in enumerate(self.algorithm_state["steps"][:self.algorithm_state["index"]], start=1):
-                for vertex in self.vertices:
-                    if vertex.id == vertex_id:
-                        self.canvas.itemconfig(vertex.canvas_object_id, fill=self.algorithm_fill)
-                        self.canvas.itemconfig(vertex.canvas_text, text=str(index), fill="white")
-        
+        for data in self.algorithm_state["logs"]["logs"][self.algorithm_state["index"]]:
+            self.infobox.log(data)
 
+        edges = self.algorithm_state["logs"]["edges"][self.algorithm_state["index"]]
+        for edge, state in edges.items():
+            if state:
+                self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+            else:
+                self.canvas.itemconfig(edge.canvas_object_id, fill="red")
+
+        vertices = self.algorithm_state["logs"]["vertices"][self.algorithm_state["index"]]
+        for vertex, state in vertices.items():
+            if state:
+                self.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+            else:
+                self.canvas.itemconfig(vertex.canvas_object_id, fill="red")
 
     def reset_vertices_and_edges(self, event):
         for vertex in self.vertices:
@@ -721,7 +732,7 @@ class App:
         return cost
     
     def clear_algorithm_state(self):
-        self.algorithm_state = {"steps": [], "type": None, "index": None}
+        self.algorithm_state = {"index": None, "logs": []}
 
     def __global_click_dropdown_close(self, event):
         if self.algorithm_dropdown.expanded:

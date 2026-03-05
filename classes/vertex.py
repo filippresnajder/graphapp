@@ -42,7 +42,7 @@ class Vertex:
         self.fill_color, self.outline_color, self.text_color = fill, outline, text
         self.app.canvas.itemconfig(self.canvas_object_id, fill=self.fill_color, outline=self.outline_color)
         self.app.canvas.itemconfig(self.canvas_text, fill=self.text_color, text=self.tag)
-        if self.app.algorithm_state["steps"]:
+        if self.app.algorithm_state["logs"]:
             self.app.infobox.clear()
             self.app.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
             self.app.reset_vertices_and_edges(event=None)
@@ -61,7 +61,7 @@ class Vertex:
         for cid in (self.canvas_object_id, self.canvas_text):
             self.app.canvas_id_to_vertex.pop(cid, None)
 
-        if self.app.algorithm_state["steps"]:
+        if self.app.algorithm_state["logs"]:
             self.app.infobox.clear()
             self.app.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
             self.app.reset_vertices_and_edges(event=None)
