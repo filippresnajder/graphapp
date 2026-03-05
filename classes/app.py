@@ -268,7 +268,10 @@ class App:
         }
 
         for edge in mst_edges:
+            v1, v2 = edge.vertices
             self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+            self.canvas.itemconfig(v1.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+            self.canvas.itemconfig(v2.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
 
         self.state = None
 
