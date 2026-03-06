@@ -14,6 +14,7 @@ class Vertex:
         self.edges = []
         self.canvas_object_id = self.app.canvas.create_oval(coords, fill=self.fill_color, outline=self.outline_color, width=width, tags=VERTEX_TAG)
         self.canvas_text = self.app.canvas.create_text(self.get_center_x(), self.get_center_y(), fill=self.text_color, text=self.tag, font=("Arial", 12), tags=VERTEX_TAG)
+        self.dfs_bfs_order = self.app.canvas.create_text(self.get_center_x(), self.get_center_y() - (RADIUS * 1.5), fill="", text="", font=("Arial", 12))
         Vertex.identifier += 1
 
     def is_clicked(self, x, y):
@@ -32,6 +33,7 @@ class Vertex:
         self.coords = (nx-r, ny-r, nx+r, ny+r)
         self.app.canvas.coords(self.canvas_object_id, self.coords)
         self.app.canvas.coords(self.canvas_text, nx, ny)
+        self.app.canvas.coords(self.dfs_bfs_order, nx, ny - (RADIUS * 1.5))
 
         for edge in self.edges:
             if self in edge.vertices:

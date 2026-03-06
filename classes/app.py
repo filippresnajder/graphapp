@@ -33,7 +33,8 @@ class App:
         self.edges = []
         self.algorithm_state = {
             "index": None,
-            "steps": []
+            "steps": [],
+            "is_bfs_or_dfs": False
         }
         self.canvas_id_to_vertex = {}
         self.canvas_id_to_edge = {}
@@ -202,7 +203,8 @@ class App:
             "index": -1, 
             "steps": {"logs": logs,
                      "edges": edge_logs,
-                     "vertices": vertices_logs}    
+                     "vertices": vertices_logs},
+            "is_bfs_or_dfs": False   
         }
 
         self.state = None
@@ -264,7 +266,8 @@ class App:
             "index": -1, 
             "steps": {"logs": logs,
                      "edges": edge_logs,
-                     "vertices": vertices_logs}    
+                     "vertices": vertices_logs},
+            "is_bfs_or_dfs": False       
         }
 
         for edge in mst_edges:
@@ -319,7 +322,8 @@ class App:
             "index": -1, 
             "steps": {"logs": logs,
                      "edges": edge_logs,
-                     "vertices": vertices_logs}    
+                     "vertices": vertices_logs},
+            "is_bfs_or_dfs": False       
         }
 
         for edge in mst_edges:
@@ -352,25 +356,28 @@ class App:
         nx_tree = nx.bfs_tree(nx_G, start_vertex.id)
         nx_edges = sorted(sorted(edge) for edge in nx_tree.edges())
 
-        own_order, own_tree_edges, logs = self.algorithms.bfs(start_vertex)
+        own_tree_edges, vertex_order, logs, edge_logs, vertices_logs = self.algorithms.bfs(start_vertex)
         own_sorted = sorted(sorted(edge) for edge in own_tree_edges)
 
-        logs.append("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
+        self.infobox.log("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
         if nx_edges != own_sorted:
             self.infobox.log("Chyba: Test medzi vlastným algoritmom a NetworkX algoritmom zlyhal")
             return
 
-        logs.append("Výsledky sedia, ukončujem algoritmus")
+        self.infobox.log("Výsledky sedia")
+        self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu.")
 
         self.algorithm_state = {
-            "steps": own_order,      
-            "type": "vertices",     
-            "index": len(own_order),       
+            "index": -1, 
+            "steps": {"logs": logs,
+                     "edges": edge_logs,
+                     "vertices": vertices_logs},
+            "is_bfs_or_dfs": True       
         }
-        self.__show_algorithm_steps_in_memory()
 
-        for data in logs:
-            self.infobox.log(data)  
+        for vertex in self.vertices:
+            self.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+            self.canvas.itemconfig(vertex.dfs_bfs_order, fill=DEFAULT_ALGORITHM_FILL, text=str(vertex_order[vertex]))
 
         self.state = None
 
@@ -402,22 +409,18 @@ class App:
         own_order, own_tree_edges, logs = self.algorithms.dfs(start_vertex)
         own_edges = {tuple(sorted(edge)) for edge in own_tree_edges}
 
-        logs.append("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
+        self.infobox.log("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
         if nx_edges != own_edges:
             self.infobox.log("Chyba: Test medzi vlastným algoritmom a NetworkX algoritmom zlyhal")
             return
         
-        logs.append("Výsledky sedia, ukončujem algoritmus")
+        self.infobox.log("Výsledky sedia, ukončujem algoritmus")
 
         self.algorithm_state = {
             "steps": own_order,      
             "type": "vertices",     
             "index": len(own_order),       
         }
-        self.__show_algorithm_steps_in_memory()
-
-        for data in logs:
-            self.infobox.log(data)  
 
         self.state = None
 
@@ -527,24 +530,26 @@ class App:
         for data in self.algorithm_state["steps"]["logs"][self.algorithm_state["index"]]:
             self.infobox.log(data)
 
-        edges = self.algorithm_state["steps"]["edges"][self.algorithm_state["index"]]
-        for edge, state in edges.items():
-            if state:
-                self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
-            else:
-                self.canvas.itemconfig(edge.canvas_object_id, fill="red")
+        if self.algorithm_state["is_bfs_or_dfs"]:
+            edges = self.algorithm_state["steps"]["edges"][self.algorithm_state["index"]]
+            for edge, state in edges.items():
+                if state:
+                    self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+                else:
+                    self.canvas.itemconfig(edge.canvas_object_id, fill="red")
 
         vertices = self.algorithm_state["steps"]["vertices"][self.algorithm_state["index"]]
         for vertex, state in vertices.items():
             if state:
                 self.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
-            else:
-                self.canvas.itemconfig(vertex.canvas_object_id, fill="red")
+                if self.algorithm_state["is_bfs_or_dfs"]:
+                    self.canvas.itemconfig(vertex.dfs_bfs_order, fill=DEFAULT_ALGORITHM_FILL, text=str(state))
 
     def reset_vertices_and_edges(self, event):
         for vertex in self.vertices:
             self.canvas.itemconfig(vertex.canvas_object_id, fill=vertex.fill_color, outline=vertex.outline_color)
             self.canvas.itemconfig(vertex.canvas_text, fill=vertex.text_color, text=vertex.tag)
+            self.canvas.itemconfig(vertex.dfs_bfs_order, fill="", text="")
         for edge in self.edges:
             self.canvas.itemconfig(edge.canvas_object_id, fill=edge.line_color)
 
@@ -718,11 +723,8 @@ class App:
         for edge in self.edges:
             edge.update_position()
     
-    def __mst_cost_self(self, edges):
-        return sum(e.weight for e in edges)
-    
     def clear_algorithm_state(self):
-        self.algorithm_state = {"index": None, "steps": []}
+        self.algorithm_state = {"index": None, "steps": [], "is_bfs_or_dfs": False}
 
     def __global_click_dropdown_close(self, event):
         if self.algorithm_dropdown.expanded:
