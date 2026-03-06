@@ -179,7 +179,7 @@ class Algorithms:
             mst_cost += weight
 
             steps_log.append(f"Vrchol {current_vertex.tag} ešte nebol navštívený, pridávam ho do minimálnej kostry grafu")
-            steps_log.append(f"Momentálna váha minimálnej kostry grafu je {mst_cost}")
+            steps_log.append(f"Momentálna cena minimálnej kostry grafu je {mst_cost}")
             logs.append(steps_log)
             mst = {e: True for e in mst_edges}
             cyclic = {e: False for e in cyclic_edges}
@@ -208,35 +208,53 @@ class Algorithms:
     def kruskal(self):
         self.app.infobox.clear()
 
+        self.app.infobox.log("Spúšťam Kruskalov algoritmus")
+
         if self.__is_graph_oriented():
             self.app.infobox.log("Chyba: Kruskalov algoritmus nefunguje na orientované grafy")
             return False
         
         logs = []
-        edges = []
-        for edge in self.app.edges:
-            v1, v2 = edge.vertices
-            edges.append((edge.weight, edge.id, v1, v2))
+        edges_logs = []
+        vertices_logs = []
 
-        edges.sort(key=lambda x: x[0])
+        edges = self.app.edges
+        edges.sort(key=lambda e: e.weight)
 
-        logs.append("Spúštam Kruskalov algoritmus a zoraďujem si hrany od najmenšej po najväčšiu")
+        first_log = "Zoraďujem hrany podľa váhy od najmenšej po najväčšiu a postupne ich budem pridávať do minimálnej kostry stromu, tak aby nevznikol cyklus"
+        logs.append([first_log])
+        edges_logs.append({})
+        vertices_logs.append({})
 
         parent = {v: v for v in self.app.vertices}
         rank = {v: 0 for v in self.app.vertices}
+
+        mst_edges = []
+        cyclic_edges = []
+        mst_cost = 0
 
         def find(vertex):
             if parent[vertex] != vertex:
                 parent[vertex] = find(parent[vertex])
             return parent[vertex]
         
-        def union(u, v, weight):
+        def union(edge):
+            nonlocal mst_cost
+            step_log = []
+            u, v, weight = edge.vertices[0], edge.vertices[1], edge.weight
             root_u = find(u)
             root_v = find(v)
-            logs.append(f"Kontrola hrany medzi vrcholmi {u.tag} - {v.tag} s váhou {weight}")
+            step_log.append(f"Kontrolujem hranu s váhou {weight} medzi vrcholmi {u.tag} a {v.tag}")
 
             if root_u == root_v:
-                logs.append("Vznikol cyklus, preskakujem")
+                step_log.append("Vznikol cyklus, danú hranu nepridávam do minimálnej kostry stromu")
+                cyclic_edges.append(edge)
+                mst = {e: True for e in mst_edges}
+                cyclic = {e: False for e in cyclic_edges}
+                merged = mst | cyclic
+                logs.append(step_log)
+                edges_logs.append(merged)
+                vertices_logs.append({})
                 return False
             
             if rank[root_u] < rank[root_v]:
@@ -247,15 +265,29 @@ class Algorithms:
                 parent[root_v] = root_u
                 rank[root_u] += 1
 
-            logs.append("Cyklus nevznikol, pridávam ju do minimálnej kostry grafu")
+            mst_cost += weight
+            step_log.append("Cyklus nevznikol, hranu pridávam do minimálnej kostry grafu")
+            step_log.append(f"Momentálna cena minimálnej kostry grafu je {mst_cost}")
+            logs.append(step_log)
+            mst_edges.append(edge)
+            mst = {e: True for e in mst_edges}
+            cyclic = {e: False for e in cyclic_edges}
+            merged = mst | cyclic
+            edges_logs.append(merged)
+            vertices_logs.append({})
             return True
         
-        mst_edges = []
-        for weight, edge_id, u, v in edges:
-            if union(u,v,weight):
-                mst_edges.append(edge_id)
+        for edge in edges:
+            union(edge)
 
-        return (mst_edges, logs)
+        final_step_logs = []
+        final_step_logs.append("Všetky hrany boli skontrolované, hrany ktoré boli pridané do minimálnej kostry grafu sú zvýraznené")
+        final_step_logs.append(f"Celková cena minimálnej kostry grafu je {mst_cost}")
+        logs.append(final_step_logs)
+        edges_logs.append({e: True for e in mst_edges})
+        vertices_logs.append({})
+
+        return (mst_edges, mst_cost, logs, edges_logs, vertices_logs)
     
     def bfs(self, start_vertex):
         self.app.infobox.clear()

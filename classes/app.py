@@ -15,8 +15,8 @@ from classes.user_interface import UserInterface
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR, DEFAULT_BUTTON_COLOR,
                        DEFAULT_DROPDOWN_BUTTON_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
-# TODO: Implement 3 more algorithms - FW, Hamiltonova cesta, Eulerov tah
 # TODO: Lepsie/Podrobnejsie krokovanie
+# TODO: Implement 3 more algorithms - FW, Hamiltonova cesta, Eulerov tah
 # TODO: Implement test section
 
 # LATER TODO: Check for infobox what is written what is not etc make sure info is readable
@@ -294,11 +294,7 @@ class App:
             self.state = None
             return
 
-        try:
-            mst_edges, logs = self.algorithms.kruskal()
-        except Exception as e:
-            self.state = None
-            return
+        mst_edges, mst_cost, logs, edge_logs, vertices_logs = self.algorithms.kruskal()
         
         if not mst_edges:
             self.state = None
@@ -306,28 +302,28 @@ class App:
         
         self.reset_vertices_and_edges(None)
 
-        nx_cost = nx_mst.size(weight="weight")
-        own_cost = self.__mst_cost_self(mst_edges)
+        self.infobox.log("Algoritmus úspešne prebehol")
+        self.infobox.log("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
 
-        logs.append("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
-        if (nx_cost != own_cost):
+        nx_mst_cost = nx_mst.size(weight="weight")
+        if (nx_mst_cost != mst_cost):
             self.infobox.log("Chyba: Test medzi vlastným algoritmom a NetworkX algoritmom zlyhal")
-            self.infobox.log(f"Váha NetworkX: {nx_cost}")
-            self.infobox.log(f"Váha Vlastného algoritmu: {own_cost}")
+            self.infobox.log(f"Váha NetworkX: {nx_mst_cost}")
+            self.infobox.log(f"Váha Vlastného algoritmu: {mst_cost}")
             return  
 
-        logs.append(f"Výsledky sedia - kostra bola vytvorená, celková váha je {own_cost}")
-        logs.append("Ukončujem algoritmus")
+        self.infobox.log(f"Výsledky sedia - kostra bola vytvorená, celková váha je {mst_cost}")
+        self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu.")
 
         self.algorithm_state = {
-            "steps": mst_edges,      
-            "type": "edges",
-            "index": len(mst_edges),       
+            "index": -1, 
+            "steps": {"logs": logs,
+                     "edges": edge_logs,
+                     "vertices": vertices_logs}    
         }
-        self.__show_algorithm_steps_in_memory()
 
-        for data in logs:
-            self.infobox.log(data)  
+        for edge in mst_edges:
+            self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
 
         self.state = None
 
