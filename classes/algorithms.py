@@ -214,8 +214,7 @@ class Algorithms:
         edges_logs = []
         vertices_logs = []
 
-        edges = self.app.edges
-        edges.sort(key=lambda e: e.weight)
+        edges = sorted(self.app.edges, key=lambda e: e.weight)
 
         first_log = "Zoraďujem hrany podľa váhy od najmenšej po najväčšiu a postupne ich budem pridávať do minimálnej kostry stromu, tak aby nevznikol cyklus"
         logs.append([first_log])
@@ -321,7 +320,8 @@ class Algorithms:
                 neighbour = self.__get_neighbour(edge, current)
                 if neighbour is None:
                     continue
-                neighbours.append(neighbour)
+                if neighbour not in neighbours:
+                    neighbours.append(neighbour)
 
             not_visited = [n for n in neighbours if n not in visited]
 
@@ -329,7 +329,7 @@ class Algorithms:
             step_logs.append(f"Vrcholy, ktoré ešte neboli navštívené {[n.tag for n in not_visited]}")
 
             if not not_visited:
-                step_logs.append(f"Z vrcholu {current.tag} nie su dostupné žiadne nenavštívené vrcholy, prechádzam na ďalší ešte neskontrolovaný vrchol")
+                step_logs.append(f"Z vrcholu {current.tag} nie sú dostupné žiadne nenavštívené vrcholy, prechádzam na ďalší ešte neskontrolovaný vrchol")
                 logs.append(step_logs)
                 edges_logs.append({})
                 vertices_logs.append({v: visited_number[v] for v in visited})
@@ -346,15 +346,15 @@ class Algorithms:
                     visited.add(neighbour)
                     queue.append(neighbour)
                     tree_edges.append((current.id, neighbour.id))
-                    counter += 1
                     step_log = []
                     step_log.append(f"Vrchol {neighbour.tag} ešte nebol navštívený, navštevujem ho (Určujem mu poradie v BFS na {counter})")
                     step_log.append(f"Vrcholy, ktore je ešte možné navštíviť z vrcholu {current.tag} sú: {[n.tag for n in not_visited]}")
                     logs.append(step_log)
                     edges_logs.append({})
                     vertices_logs.append({v: visited_number[v] for v in visited})
+                    counter += 1
             
-        final_log = "Všetky vrcholy boli skontrolované a navštívené nad jednotlivými vrcholmi je vypísané poradie BFS"
+        final_log = "Všetky vrcholy boli skontrolované a navštívené -> nad jednotlivými vrcholmi je vypísané poradie BFS"
         logs.append([final_log])
         vertices_logs.append({v: visited_number[v] for v in visited})
         edges_logs.append({})
@@ -364,54 +364,75 @@ class Algorithms:
     def dfs(self, start_vertex):
         self.app.infobox.clear()
         visited = set()
-        traversal_order = []
         tree_edges = []
+        counter = 1
+
+        self.app.infobox.log("Spúšťam algoritmus DFS")
+        
         logs = []
+        edges_logs = []
+        vertices_logs = []
 
         visited_number = {}
-        counter = 1
         visited_number[start_vertex] = counter
-        counter += 1
 
+        first_log = f"Počiatočnému vrcholu {start_vertex.tag} dávam označenie v DFS na {visited_number[start_vertex]}"
+        logs.append([first_log])
+        vertices_logs.append({start_vertex: visited_number[start_vertex]})
+        edges_logs.append({})
+        
+        counter += 1
         def dfs_visit(current):
             nonlocal counter
-            visited.add(current.id)
-            traversal_order.append(current.id)
-            logs.append(f"Navštevujem vrchol s pôvodným označením {current.tag} -> (poradie v DFS - {visited_number[current]})")
+            visited.add(current)
+            step_logs = []
+            step_logs.append(f"Kontrolujem vrchol {current.tag} (poradie v DFS - {visited_number[current]})")
 
             neighbours = []
-            logs.append(f"Pozerám sa na všetky hrany, ktoré vedú z vrcholu {current.tag} -> (poradie v DFS - {visited_number[current]})")
             for edge in current.edges:
-                v1, v2 = edge.vertices
+                neighbour = self.__get_neighbour(edge, current)
+                if neighbour is None:
+                    continue
+                if neighbour not in neighbours:
+                    neighbours.append(neighbour)
 
-                if edge.orientation == "yes":
-                    if v1 != current:
-                        continue
-                    neighbour = v2
-                else:
-                    neighbour = v2 if v1 == current else v1
+            not_visited = [n for n in neighbours if n not in visited]
 
-                neighbours.append(neighbour)
+            step_logs.append(f"Vrcholy, ktoré sú dosiahnuteľné sú {[n.tag for n in neighbours]}")
+            step_logs.append(f"Vrcholy, ktoré ešte neboli navštívené {[n.tag for n in not_visited]}")
 
-            neighbours = sorted(neighbours, key=lambda v: v.id)
-            neighbours_to_visit = [neighbour for neighbour in neighbours if neighbour.id not in visited]
+            if not not_visited:
+                step_logs.append(f"Z vrcholu {current.tag} nie sú dostupné žiadne nenavštívené vrcholy, vraciam sa späť")
+                logs.append(step_logs)
+                edges_logs.append({})
+                vertices_logs.append({v: visited_number[v] for v in visited})
+                return
+            
+            logs.append(step_logs)
+            edges_logs.append({})
+            vertices_logs.append({v: visited_number[v] for v in visited})
 
-            if neighbours_to_visit:
-                logs.append("Zoraďujem vrcholy")
-            else:
-                logs.append("Nenašli sa žiadne dostupné vrcholy, presúvam sa ďalej")
-
-            for neighbour in neighbours_to_visit:
-                if neighbour.id not in visited:
+            for neighbour in neighbours:
+                if neighbour not in visited:
+                    step_log = []
                     visited_number[neighbour] = counter
-                    logs.append(f"Vrchol s pôvodným označením {neighbour.tag} ešte nebol navštívený, navštevujem ho -> (Určujem mu poradie v DFS na {counter})")
+                    visited.add(neighbour)
+                    step_log.append(f"Vrchol s pôvodným označením {neighbour.tag} ešte nebol navštívený, navštevujem ho -> (Určujem mu poradie v DFS na {counter})")
+                    logs.append(step_log)
+                    edges_logs.append({})
+                    vertices_logs.append({v: visited_number[v] for v in visited})
                     tree_edges.append((current.id, neighbour.id))
                     counter += 1
                     dfs_visit(neighbour)
         
         dfs_visit(start_vertex)
 
-        return (traversal_order, tree_edges, logs)
+        final_log = "Všetky vrcholy boli skontrolované a navštívené -> nad jednotlivými vrcholmi je vypísané poradie DFS"
+        logs.append([final_log])
+        vertices_logs.append({v: visited_number[v] for v in visited})
+        edges_logs.append({})
+
+        return (tree_edges, visited_number, logs, edges_logs, vertices_logs)
 
     def floyd_warshall(self):
         pass

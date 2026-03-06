@@ -365,7 +365,7 @@ class App:
             return
 
         self.infobox.log("Výsledky sedia")
-        self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu.")
+        self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")
 
         self.algorithm_state = {
             "index": -1, 
@@ -376,8 +376,9 @@ class App:
         }
 
         for vertex in self.vertices:
-            self.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
-            self.canvas.itemconfig(vertex.dfs_bfs_order, fill=DEFAULT_ALGORITHM_FILL, text=str(vertex_order[vertex]))
+            if vertex in vertex_order:
+                self.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+                self.canvas.itemconfig(vertex.dfs_bfs_order, fill=DEFAULT_ALGORITHM_FILL, text=str(vertex_order[vertex]))
 
         self.state = None
 
@@ -403,10 +404,10 @@ class App:
         self.reset_vertices_and_edges(event)
 
         nx_G = self.build_nx_graph()
-        nx_tree = nx.dfs_tree(nx_G, start_vertex.id, sort_neighbors=sorted)
+        nx_tree = nx.dfs_tree(nx_G, start_vertex.id)
         nx_edges = {tuple(sorted(edge)) for edge in nx_tree.edges()}
 
-        own_order, own_tree_edges, logs = self.algorithms.dfs(start_vertex)
+        own_tree_edges, vertex_order, logs, edge_logs, vertices_logs = self.algorithms.dfs(start_vertex)
         own_edges = {tuple(sorted(edge)) for edge in own_tree_edges}
 
         self.infobox.log("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
@@ -414,13 +415,21 @@ class App:
             self.infobox.log("Chyba: Test medzi vlastným algoritmom a NetworkX algoritmom zlyhal")
             return
         
-        self.infobox.log("Výsledky sedia, ukončujem algoritmus")
+        self.infobox.log("Výsledky sedia")
+        self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")
 
         self.algorithm_state = {
-            "steps": own_order,      
-            "type": "vertices",     
-            "index": len(own_order),       
+            "index": -1, 
+            "steps": {"logs": logs,
+                     "edges": edge_logs,
+                     "vertices": vertices_logs},
+            "is_bfs_or_dfs": True       
         }
+
+        for vertex in self.vertices:
+            if vertex in vertex_order:
+                self.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+                self.canvas.itemconfig(vertex.dfs_bfs_order, fill=DEFAULT_ALGORITHM_FILL, text=str(vertex_order[vertex]))
 
         self.state = None
 
@@ -530,7 +539,7 @@ class App:
         for data in self.algorithm_state["steps"]["logs"][self.algorithm_state["index"]]:
             self.infobox.log(data)
 
-        if self.algorithm_state["is_bfs_or_dfs"]:
+        if not self.algorithm_state["is_bfs_or_dfs"]:
             edges = self.algorithm_state["steps"]["edges"][self.algorithm_state["index"]]
             for edge, state in edges.items():
                 if state:
