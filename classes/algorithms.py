@@ -161,7 +161,7 @@ class Algorithms:
 
             if current_vertex in visited:
                 cyclic_edges.append(edge)
-                steps_log.append(f"Z danej hrany medzi vrchomi {previous_vertex} a {current_vertex} vznikla kružnica, danú hranu nepridávam do minimálnej kostry grafu")
+                steps_log.append(f"Z danej hrany medzi vrchomi {previous_vertex.tag} a {current_vertex.tag} vznikla kružnica, danú hranu nepridávam do minimálnej kostry grafu")
                 logs.append(steps_log)
                 mst = {e: True for e in mst_edges}
                 cyclic = {e: False for e in cyclic_edges}
