@@ -15,8 +15,7 @@ from classes.user_interface import UserInterface
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR, DEFAULT_BUTTON_COLOR,
                        DEFAULT_DROPDOWN_BUTTON_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
-# TODO: Lepsie/Podrobnejsie krokovanie
-# TODO: Implement 3 more algorithms - FW, Hamiltonova cesta, Eulerov tah
+# TODO: Implement 3 more algorithms - FW, Hamiltonova kružnica, Eulerov tah
 # TODO: Implement test section
 
 # LATER TODO: Check for infobox what is written what is not etc make sure info is readable
