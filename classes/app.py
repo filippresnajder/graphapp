@@ -16,7 +16,7 @@ from classes.user_interface import UserInterface
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR, DEFAULT_BUTTON_COLOR,
                        DEFAULT_DROPDOWN_BUTTON_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
-# TODO: Implement 3 more algorithms - FW, Hamiltonova kružnica, Eulerov tah
+# TODO: Implement 2 more algorithms - Hamiltonova kružnica, Eulerov tah
 # TODO: Implement test section
 
 # LATER TODO: Check for infobox what is written what is not etc make sure info is readable
@@ -456,7 +456,7 @@ class App:
         for dv in distances:
             string = f"{dv}: " + ", ".join(f"{du}: {distances[dv][du]}" for du in distances[dv])
             self.infobox.log(string)
-            
+
         self.infobox.log("\nMatica medzi vrcholov:")
         for nv in prev_vertex:
             string = f"{nv}: " + ", ".join(f"{nu}: {prev_vertex[nv][nu]}" if prev_vertex[nv][nu] is not None else f"{nu}: x" for nu in prev_vertex[nv])

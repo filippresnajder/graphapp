@@ -70,7 +70,7 @@ class Vertex:
         self.app.clear_algorithm_state()
 
     def __repr__(self):
-        return self.tag
+        return str(self.tag)
 
     @staticmethod
     def validate(app, data):
