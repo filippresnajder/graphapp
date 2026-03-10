@@ -119,7 +119,8 @@ class Button:
         self.app.close_dropdown(self.app.algorithm_info_dropdown)
 
     def __handle_floyd_warshall(self):
-        print("FW algo")
+        if self.app.vertices and self.app.edges:
+            self.app.visualize_floyd_warshall()
         self.app.close_dropdown(self.app.algorithm_dropdown)
         self.app.close_dropdown(self.app.algorithm_info_dropdown)
 

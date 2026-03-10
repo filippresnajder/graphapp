@@ -69,6 +69,9 @@ class Vertex:
             self.app.reset_vertices_and_edges(event=None)
         self.app.clear_algorithm_state()
 
+    def __repr__(self):
+        return self.tag
+
     @staticmethod
     def validate(app, data):
         try:

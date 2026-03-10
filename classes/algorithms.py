@@ -435,7 +435,99 @@ class Algorithms:
         return (tree_edges, visited_number, logs, edges_logs, vertices_logs)
 
     def floyd_warshall(self):
-        pass
+        self.app.infobox.clear()
+        self.app.infobox.log("Spúšťam Floyd-Warshallov algoritmus")
+
+        logs = []
+        edge_logs = []
+        vertices_logs = []
+
+        distances = {v: {u: float("inf") for u in self.app.vertices if u.edges} for v in self.app.vertices if v.edges}
+        prev_vertex = {v: {u: None for u in self.app.vertices if u.edges} for v in self.app.vertices if v.edges}
+
+        for vertex in self.app.vertices:
+            if vertex.edges:
+                distances[vertex][vertex] = 0
+
+        for edge in self.app.edges:
+            v, u = edge.vertices
+            weight = edge.weight
+
+            if weight < distances[v][u]:
+                distances[v][u] = weight
+                prev_vertex[v][u] = u
+
+            if edge.orientation != "yes":
+                if weight < distances[u][v]:
+                    distances[u][v] = weight
+                    prev_vertex[u][v] = v
+
+        step_logs = []
+        step_logs.append("Inicializujem maticu vzdialeností podľa hrán grafu")
+        logs.append(step_logs)
+        edge_logs.append({})
+        vertices_logs.append({})
+        
+        for k in self.app.vertices:
+            step_log = []
+            step_log.append(f"Ako medzi vrchol skúmam vrchol {k}")
+            step_log.append(f"Budem skúmať takú dvojicu vrcholov, ktorá je dosiahnuteľná pomocou vrcholu {k}")
+            step_log.append("\nMomentálny stav matice vzdialeností:")
+            for dv in distances:
+                string = f"{dv}: " + ", ".join(f"{du}: {distances[dv][du]}" for du in distances[dv])
+                step_log.append(string)
+            step_log.append("\nMomentálny stav matice medzi vrcholov:")
+            for nv in prev_vertex:
+                string = f"{nv}: " + ", ".join(f"{nu}: {prev_vertex[nv][nu]}" if prev_vertex[nv][nu] is not None else f"{nu}: x" for nu in prev_vertex[nv])
+                step_log.append(string)
+            logs.append(step_log)
+            edge_logs.append({})
+            vertices_logs.append({k: True})
+            found_paths = 0
+            for i in self.app.vertices:
+                for j in self.app.vertices:
+                    if (k.edges and i.edges and j.edges) and distances[i][k] + distances[k][j] < distances[i][j]:
+                        calculation_log = []
+                        calculation_log.append(f"Kontrolujem cestu z vrcholu {i} do vrcholu {j} pomocou medzi vrcholu {k}")
+                        calculation_log.append(f"Vzdialenosť z vrcholu {i} do vrcholu {k} je {distances[i][k]}")
+                        calculation_log.append(f"Vzdialenosť z vrcholu {k} do vrcholu {j} je {distances[k][j]}")
+                        calculation_log.append(f"Súčet týchto vzdialeností je {distances[i][k] + distances[k][j]}, čo je menej ako momentálna vzdialenosť z vrcholu {i} do vrcholu {j}, ktorá je {distances[i][j] if distances[i][j] != float('inf') else 'nekonečno'}")
+                        distances[i][j] = distances[i][k] + distances[k][j]
+                        prev_vertex[i][j] = prev_vertex[i][k]
+                        calculation_log.append(f"Našla sa kratšia cesta z vrcholu {i} do vrcholu {j} cez vrchol {k}")
+                        logs.append(calculation_log)
+                        edge_logs.append({})
+                        vertices_logs.append({i: True, j: True, k: True})
+                        found_paths += 1
+
+            if found_paths == 0:
+                logs.append(["Nenašiel som žiadnu dvojicu vrcholov, ktorá by bola kratšia"])
+                edge_logs.append({})
+                vertices_logs.append({k: True})
+
+        for vertex in self.app.vertices:
+            if vertex.edges and distances[vertex][vertex] < 0:
+                self.app.infobox.log("Chyba: Graf obsahuje negatívny cyklus")
+                return None
+
+        converted = {v.id: {u.id: distances[v][u] for u in distances[v]} for v in distances}
+
+        final_log = []
+        final_log.append("Všetky vrcholy boli skontrolované, nižšie je možné vidieť vypočítané matice")
+        final_log.append("\nMatica vzdialeností:")
+        for dv in distances:
+            string = f"{dv}: " + ", ".join(f"{du}: {distances[dv][du]}" for du in distances[dv])
+            final_log.append(string)
+        final_log.append("\nMatica medzi vrcholov:")
+        for nv in prev_vertex:
+            string = f"{nv}: " + ", ".join(f"{nu}: {prev_vertex[nv][nu]}" if prev_vertex[nv][nu] is not None else f"{nu}: x" for nu in prev_vertex[nv])
+            final_log.append(string)
+        logs.append(final_log)
+        edge_logs.append({})
+        vertices_logs.append({})
+
+        return converted, distances, prev_vertex, logs, edge_logs, vertices_logs
+
 
     def hamilton_cycle(self):
         pass

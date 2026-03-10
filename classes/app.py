@@ -5,6 +5,7 @@ import json
 import re
 
 from tkinter import filedialog
+from pprint import pprint
 from classes.button import Button
 from classes.vertex import Vertex
 from classes.edge import Edge
@@ -429,6 +430,45 @@ class App:
             if vertex in vertex_order:
                 self.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
                 self.canvas.itemconfig(vertex.dfs_bfs_order, fill=DEFAULT_ALGORITHM_FILL, text=str(vertex_order[vertex]))
+
+        self.state = None
+
+    def visualize_floyd_warshall(self):
+        if self.state != "floyd_warshall":
+            return
+        
+        self.clear_algorithm_state()
+        self.reset_vertices_and_edges(None)
+
+        nx_G = self.build_nx_graph()
+        nx_fw = nx.floyd_warshall(nx_G, weight="weight")
+        nx_results = {a: dict(b) for a,b in nx_fw.items()}
+        own_res, distances, prev_vertex, logs, edge_logs, vertices_logs = self.algorithms.floyd_warshall()
+
+        self.infobox.log("Porovnávam výsledky z algoritmu s výsledkami z NetworkX")
+        if nx_results != own_res:
+            self.infobox.log("Chyba: Test medzi vlastným algoritmom a NetworkX algoritmom zlyhal")
+
+        self.infobox.log("Výsledky sedia")
+        self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")
+
+        self.infobox.log("\nMatica vzdialeností:")
+        for dv in distances:
+            string = f"{dv}: " + ", ".join(f"{du}: {distances[dv][du]}" for du in distances[dv])
+            self.infobox.log(string)
+            
+        self.infobox.log("\nMatica medzi vrcholov:")
+        for nv in prev_vertex:
+            string = f"{nv}: " + ", ".join(f"{nu}: {prev_vertex[nv][nu]}" if prev_vertex[nv][nu] is not None else f"{nu}: x" for nu in prev_vertex[nv])
+            self.infobox.log(string)
+
+        self.algorithm_state = {
+            "index": -1, 
+            "steps": {"logs": logs,
+                     "edges": edge_logs,
+                     "vertices": vertices_logs},
+            "is_bfs_or_dfs": False       
+        }
 
         self.state = None
 
