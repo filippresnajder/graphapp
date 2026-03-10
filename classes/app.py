@@ -5,7 +5,6 @@ import json
 import re
 
 from tkinter import filedialog
-from pprint import pprint
 from classes.button import Button
 from classes.vertex import Vertex
 from classes.edge import Edge
