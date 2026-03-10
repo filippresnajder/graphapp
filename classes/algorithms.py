@@ -471,7 +471,7 @@ class Algorithms:
         for k in self.app.vertices:
             step_log = []
             step_log.append(f"Ako medzi vrchol skúmam vrchol {k}")
-            step_log.append(f"Budem skúmať takú dvojicu vrcholov, ktorá je dosiahnuteľná pomocou vrcholu {k}")
+            step_log.append(f"Budem skúmať jednotlivé vzdialenosti medzi vrcholmi pomocou medzi vrcholu {k} a pokúsim sa nájsť kratšie vzdialenosti")
             step_log.append("\nMomentálny stav matice vzdialeností:")
             for dv in distances:
                 string = f"{dv}: " + ", ".join(f"{du}: {distances[dv][du]}" for du in distances[dv])
