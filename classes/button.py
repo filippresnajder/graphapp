@@ -125,7 +125,8 @@ class Button:
         self.app.close_dropdown(self.app.algorithm_info_dropdown)
 
     def __handle_hamilton_cycle(self):
-        print("Hamilton cycle algo")
+        if self.app.vertices and self.app.edges:
+            self.app.visualize_hamilton()
         self.app.close_dropdown(self.app.algorithm_dropdown)
         self.app.close_dropdown(self.app.algorithm_info_dropdown)
 

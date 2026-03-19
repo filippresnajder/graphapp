@@ -471,6 +471,33 @@ class App:
 
         self.state = None
 
+    def visualize_hamilton(self):
+        if self.state != "hamilton_cycle":
+            return
+        
+        self.clear_algorithm_state()
+        self.reset_vertices_and_edges(None)
+        logs, edge_logs, vertices_logs, path, used_edges = self.algorithms.hamilton_cycle()
+
+        if path is None or used_edges is None:
+            self.infobox.log("Hamiltonova kružnica v danom grafe neexistuje")
+            self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")
+        else:
+            self.infobox.log("Hamiltonova kružnica v danom grafe existuje")
+            self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")
+            for vertex in self.vertices:
+                self.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+            for edge in used_edges:
+                self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+
+        self.algorithm_state = {
+            "index": -1, 
+            "steps": {"logs": logs,
+                     "edges": edge_logs,
+                     "vertices": vertices_logs},
+            "is_bfs_or_dfs": False       
+        }
+
     def __check_if_clicked_on_vertex(self, x, y):
         for vertex in self.vertices:
             if vertex.is_clicked(x,y):

@@ -530,7 +530,89 @@ class Algorithms:
 
 
     def hamilton_cycle(self):
-        pass
+        self.app.infobox.clear()
+        self.app.infobox.log("Spúšťam algoritmus hľadania Hamiltonovej kružnice")
+
+        if not self.app.vertices:
+            return
+        
+        if len(self.app.vertices) > 6:
+            self.app.infobox.log("Chyba: Pre vizualizáciu tohto algoritmu z dôvodu jeho časovej náročnosti je dovolené mať maximálne iba 6 vrcholov")
+            return
+        
+        start_vertex = self.app.vertices[0]
+        path = [start_vertex]
+        visited = set([start_vertex])
+        used_edges = set()
+
+        logs = []
+        edge_logs = []
+        vertices_logs = []
+
+        logs.append([f"Ako ľubovoľný vrchol pre začiatok vyberám vrchol {start_vertex}"])
+        edge_logs.append({})
+        vertices_logs.append({v: True for v in path})
+
+        def backtrack(current, prev_edge = None):
+            if len(path) == len(self.app.vertices):
+                for edge in current.edges:
+                    neighbour = self.__get_neighbour(edge, current)
+                    if neighbour == start_vertex:
+                        path.append(start_vertex)
+                        used_edges.add(edge)
+                        logs.append([f"Všetky ostatné vrcholy sú navštívené a z vrcholu {current} vedie hrana späť do vrcholu {start_vertex}, uzatváram kružnicu"])
+                        edge_logs.append({e: True for e in used_edges})
+                        vertices_logs.append({v: True for v in path})
+                        return True
+                return False
+            
+            for edge in current.edges:
+                if edge == prev_edge:
+                    continue
+
+                neighbour = self.__get_neighbour(edge, current)
+                if neighbour is None:
+                    continue
+
+                u, v = edge.vertices
+                logs.append([f"Kontrolujem hranu medzi vrcholmi {u} a {v} (váha {edge.weight})"])
+                edge_logs.append({e: True for e in used_edges} | {edge: True})
+                vertices_logs.append({v: True for v in path})
+
+                if neighbour in visited:
+                    logs.append([f"Táto hrana nie je vhodná, nakoľko vrchol {neighbour} je už navštívený"])
+                    edge_logs.append({e: True for e in used_edges} | {edge: False})
+                    vertices_logs.append({v: True for v in path})
+                    continue
+
+                visited.add(neighbour)
+                used_edges.add(edge)
+                path.append(neighbour)
+
+                logs.append([f"Vrchol {neighbour} nie je ešte navštívený, navštevujem ho"])
+                edge_logs.append({e: True for e in used_edges} | {edge: True})
+                vertices_logs.append({v: True for v in path})
+
+                if backtrack(neighbour, edge):
+                    return True
+                    
+                visited.remove(neighbour)
+                used_edges.remove(edge)
+                path.pop()
+
+                logs.append([f"Pri danej ceste, už z vrcholu {neighbour} neexistuje žiadna možnosť, kde by som ešte nenavštívil nový vrchol, skúsim to inak, vraciam sa späť"])
+                edge_logs.append({e: True for e in used_edges})
+                vertices_logs.append({v: True for v in path})
+
+            return False
+        
+        if backtrack(start_vertex):
+            return logs, edge_logs, vertices_logs, path, used_edges
+
+        logs.append(["Dostal som sa do počiatočného vrcholu a nemám žiadnu cestu, Hamiltonova kružnica pre daný graf neexistuje"])
+        edge_logs.append({})
+        vertices_logs.append({})
+        return logs, edge_logs, vertices_logs, None, None
 
     def euler_path(self):
         pass
