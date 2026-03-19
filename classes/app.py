@@ -475,6 +475,11 @@ class App:
         if self.state != "hamilton_cycle":
             return
         
+        if len(self.vertices) > 6:
+            self.infobox.clear()
+            self.infobox.log("Chyba: Pre vizualizáciu tohto algoritmu z dôvodu jeho časovej náročnosti je dovolené mať maximálne iba 6 vrcholov")
+            return 
+        
         self.clear_algorithm_state()
         self.reset_vertices_and_edges(None)
         logs, edge_logs, vertices_logs, path, used_edges = self.algorithms.hamilton_cycle()

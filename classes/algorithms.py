@@ -532,14 +532,10 @@ class Algorithms:
     def hamilton_cycle(self):
         self.app.infobox.clear()
         self.app.infobox.log("Spúšťam algoritmus hľadania Hamiltonovej kružnice")
-
-        if not self.app.vertices:
-            return
         
         if len(self.app.vertices) > 6:
-            self.app.infobox.log("Chyba: Pre vizualizáciu tohto algoritmu z dôvodu jeho časovej náročnosti je dovolené mať maximálne iba 6 vrcholov")
             return
-        
+
         start_vertex = self.app.vertices[0]
         path = [start_vertex]
         visited = set([start_vertex])
