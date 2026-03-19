@@ -479,6 +479,8 @@ class App:
         self.reset_vertices_and_edges(None)
         logs, edge_logs, vertices_logs, path, used_edges = self.algorithms.hamilton_cycle()
 
+        # No test in here as nx does not provide raw Hamiltonian cycle function
+
         if path is None or used_edges is None:
             self.infobox.log("Hamiltonova kružnica v danom grafe neexistuje")
             self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")
