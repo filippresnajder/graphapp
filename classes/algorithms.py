@@ -600,7 +600,7 @@ class Algorithms:
                 used_edges.remove(edge)
                 path.pop()
 
-                logs.append([f"Pri danej ceste, už z vrcholu {neighbour} neexistuje žiadna možnosť, kde by som ešte nenavštívil nový vrchol, skúsim to inak, vraciam sa späť"])
+                logs.append([f"Pri danej ceste z vrcholu {neighbour} už neexistuje žiadna nepreskúmaná možnosť, kde by som ešte nenavštívil nový vrchol, skúsim to inak, vraciam sa späť"])
                 edge_logs.append({e: True for e in used_edges})
                 vertices_logs.append({v: True for v in path})
 
