@@ -186,7 +186,6 @@ class App:
         y = self.canvas.canvasy(event.y)
         result = self.__check_if_clicked_on_vertex(x, y)
         if result is None:
-            self.state = None
             return
         
         self.reset_vertices_and_edges(event)
@@ -647,6 +646,7 @@ class App:
                     start_vertex = self.selected_vertex
                     end_vertex = vertex
                     return (start_vertex, end_vertex)
+                
         return None
 
     def start_move_vertex(self, event) -> None:
