@@ -131,7 +131,10 @@ class Button:
         self.app.close_dropdown(self.app.algorithm_info_dropdown)
 
     def __handle_euler_path(self):
-        print("Euler path algo")
+        if self.app.vertices and self.app.edges:
+            self.app.infobox.clear()
+            self.app.infobox.log("Vyber začiatočný vrchol kliknutím")
+            self.app.canvas.bind("<Button-1>", self.app.visualize_eulerian_path)
         self.app.close_dropdown(self.app.algorithm_dropdown)
         self.app.close_dropdown(self.app.algorithm_info_dropdown)
 

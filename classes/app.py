@@ -15,7 +15,7 @@ from classes.user_interface import UserInterface
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR, DEFAULT_BUTTON_COLOR,
                        DEFAULT_DROPDOWN_BUTTON_COLOR, DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
-# TODO: Implement 2 more algorithms - Hamiltonova kružnica, Eulerov tah
+# TODO: Implement Eulerov tah
 # TODO: Implement test section
 
 # LATER TODO: Check for infobox what is written what is not etc make sure info is readable
@@ -472,6 +472,7 @@ class App:
         self.state = None
 
     def visualize_hamilton(self):
+        # Tu nie su použíté testy, nakoľko nx knižnica neposkytuje plnohodnotnú implementáciu algoritmu Hamiltonovho cyklu
         if self.state != "hamilton_cycle":
             return
         
@@ -483,8 +484,6 @@ class App:
         self.clear_algorithm_state()
         self.reset_vertices_and_edges(None)
         logs, edge_logs, vertices_logs, path, used_edges = self.algorithms.hamilton_cycle()
-
-        # No test in here as nx does not provide raw Hamiltonian cycle function
 
         if path is None or used_edges is None:
             self.infobox.log("Hamiltonova kružnica v danom grafe neexistuje")
@@ -504,6 +503,65 @@ class App:
                      "vertices": vertices_logs},
             "is_bfs_or_dfs": False       
         }
+
+        self.state = None
+
+    def visualize_eulerian_path(self, event):
+        if self.state != "euler_path":
+            self.state = None
+            return
+        
+        self.clear_algorithm_state()
+
+        x = self.canvas.canvasx(event.x)
+        y = self.canvas.canvasy(event.y)
+
+        start_vertex = None
+
+        for vertex in self.vertices:
+            if vertex.is_clicked(x, y):
+                start_vertex = vertex
+                break
+
+        if start_vertex is None:
+            self.state = None
+            return
+        
+        self.reset_vertices_and_edges(event)
+        
+        nx_g = self.build_nx_graph()
+
+        if not nx.has_eulerian_path(nx_g):
+            self.infobox.log("Chyba: V grafe nie sú splnené podmienky pre Eulerov ťah")
+            self.state = None
+            return
+        
+        self.infobox.log("V grafe sú splnené podmienky pre Eulerov ťah")
+
+        logs, edge_logs, vertices_logs, path, used_edges = self.algorithms.eulerian_path(start_vertex)
+
+        for vertex in path:
+            self.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+
+        for edge in used_edges:
+            self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+
+        if len(used_edges) != len(self.edges):
+            self.infobox.log(f"Eulerov ťah z vrcholu {start_vertex} neexistuje")
+            self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")
+        else:
+            self.infobox.log(f"Eulerov ťah z vrcholu {start_vertex} existuje")
+            self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")         
+
+        self.algorithm_state = {
+            "index": -1, 
+            "steps": {"logs": logs,
+                     "edges": edge_logs,
+                     "vertices": vertices_logs},
+            "is_bfs_or_dfs": False       
+        }
+
+        self.state = None
 
     def __check_if_clicked_on_vertex(self, x, y):
         for vertex in self.vertices:

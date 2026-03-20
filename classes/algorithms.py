@@ -610,9 +610,61 @@ class Algorithms:
         vertices_logs.append({})
         return logs, edge_logs, vertices_logs, None, None
 
-    def euler_path(self):
-        pass
-    
+    def eulerian_path(self, start_vertex):
+        self.app.infobox.clear()
+        self.app.infobox.log("Spúšťam algoritmus Eulerovho ťahu")
+
+        logs = []
+        edge_logs = []
+        vertices_logs = []
+
+        path = [start_vertex]
+        used_edges = set()
+
+        logs.append([f"Začínam v počiatočnom vrchole {start_vertex}"])
+        edge_logs.append({})
+        vertices_logs.append({start_vertex: True})
+
+        def get_unused_edge(vertex):
+            for edge in vertex.edges:
+                if edge in used_edges:
+                    continue
+                neighbour = self.__get_neighbour(edge, vertex)
+                if neighbour is None:
+                    continue
+                return edge
+            return None
+        
+        current = start_vertex
+        edge = get_unused_edge(start_vertex)
+        while edge:
+            neighbour = self.__get_neighbour(edge, current)
+            used_edges.add(edge)
+            path.append(neighbour)
+            
+            logs.append([f"Z vrcholu {current} Prechádzam do vrcholu {neighbour} nenavštívenou hranou (jej váha je {edge.weight})"])
+            edge_logs.append({e: True for e in used_edges})
+            vertices_logs.append({neighbour: True})
+
+            edge = get_unused_edge(neighbour)
+            current = neighbour
+
+        if len(used_edges) != len(self.app.edges):
+            step_logs = []
+            step_logs.append(f"Z vrcholu {current} už neexistuje žiadna hrana, ktorá ešte nebola použíta")
+            step_logs.append(f"Neboli navštívené všetky hrany a už nie je žiadna možná cesta z momentálneho vrcholu, Eulerov ťah z vrcholu {start_vertex} neexistuje")
+            logs.append(step_logs)
+            edge_logs.append({e: True for e in used_edges})
+            vertices_logs.append({v: True for v in path})
+            return logs, edge_logs, vertices_logs, path, used_edges
+
+        path.reverse()
+        logs.append(["Všetky hrany boli použité ibe raz, eulerov ťah bol najdený"])
+        edge_logs.append({e: True for e in used_edges})
+        vertices_logs.append({v: True for v in path})
+
+        return logs, edge_logs, vertices_logs, path, used_edges
+
     def dijkstra_info(self):
         self.app.infobox.clear()
         self.app.infobox.log("Informácie o Dijkstrovom algoritme.")
