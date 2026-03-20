@@ -16,7 +16,6 @@ from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAUL
                        DEFAULT_BUTTON_COLOR, DEFAULT_DROPDOWN_BUTTON_COLOR, DEFAULT_TEXT_COLOR,
                        DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
-# TODO: Check for infobox what is written what is not etc make sure info is readable
 # TODO: Write info about algorithms in algorithm info
 # TODO: Implement test section
 
