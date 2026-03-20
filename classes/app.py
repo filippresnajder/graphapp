@@ -14,7 +14,7 @@ from classes.infobox import Infobox
 from classes.user_interface import UserInterface
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR,
                        DEFAULT_BUTTON_COLOR, DEFAULT_DROPDOWN_BUTTON_COLOR, DEFAULT_TEXT_COLOR,
-                       DEFAULT_ALGORITHM_FILL, DEFAULT_ALGORITHM_NOT_FOCUSED, DEFAULT_ALGORITHM_NOT_SELECTED, 
+                       DEFAULT_ALGORITHM_FILL, DEFAULT_ALGORITHM_NOT_FOCUSED, DEFAULT_ALGORITHM_NOT_SELECTED,
                        DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
 # TODO: Write info about algorithms in algorithm info
