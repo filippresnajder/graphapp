@@ -95,7 +95,7 @@ class Algorithms:
 
         while current != start_vertex:
             step_log = []
-            step_log.append("Zoznam predošlých vrchlov pre jednotlivé vrcholy:")
+            step_log.append("Zoznam predchodcov pre jednotlivé vrcholy:")
             for v, d in previous.items():
                 step_log.append(f"Vrchol {v.tag} = {d[0].tag}")
             path.insert(0, current.id)
@@ -216,7 +216,7 @@ class Algorithms:
 
         edges = sorted(self.app.edges, key=lambda e: e.weight)
 
-        first_log = "Zoraďujem hrany podľa váhy od najmenšej po najväčšiu a postupne ich budem pridávať do minimálnej kostry stromu, tak aby nevznikol cyklus"
+        first_log = "Zoraďujem hrany podľa váhy od najmenšej po najväčšiu a postupne ich budem pridávať do minimálnej kostry stromu, tak aby nevznikla kružnica"
         logs.append([first_log])
         edges_logs.append({})
         vertices_logs.append({})
