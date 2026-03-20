@@ -17,6 +17,7 @@ from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAUL
                        DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
 # TODO: Write info about algorithms in algorithm info
+# TODO: Vyraznejsie znacenie algoritmov krokov ako sa vyfarbuju hrany (Width x2 a farba zelena)
 # TODO: Implement test section
 
 # LATER TODO: Zdroje k pseudokodom

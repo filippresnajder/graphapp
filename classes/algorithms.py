@@ -50,7 +50,7 @@ class Algorithms:
                     continue
 
                 if edge not in edges_visited:
-                    step_log.append(f"Skúmam hranu {current.tag} -> {neighbour.tag} (váha {edge.weight})")
+                    step_log.append(f"Skúmam hranu {current.tag} {('->' if edge.orientation == "yes" else '-')} {neighbour.tag} (váha {edge.weight})")
 
                 new_dist = current_dist + edge.weight
 
@@ -70,12 +70,12 @@ class Algorithms:
             vertices_checked.add(current)
 
             step_log.append("")
-            step_log.append("Momentálne najkratšie vzdialenosti do vrcholov po tomto kroku:")
+            step_log.append("Momentálne najkratšie vzdialenosti do vrcholov po aktuálnom kroku:")
             for v, d in distances.items():
                 step_log.append(f"Vrchol {v.tag} {'(navštívený)' if v in vertices_checked else ''} = {('nekonečno' if d == float('inf') else d)}")
 
             step_log.append("")
-            step_log.append("Zoznam predošlých vrchlov pre jednotlivé vrcholy:")
+            step_log.append("Zoznam predchodcov pre jednotlivé vrcholy:")
             for v, d in previous.items():
                 step_log.append(f"Vrchol {v.tag} = {d[0].tag}")
 
@@ -175,7 +175,7 @@ class Algorithms:
             mst_cost += weight
 
             steps_log.append(f"Vrchol {current_vertex.tag} ešte nebol navštívený, pridávam ho do minimálnej kostry grafu")
-            steps_log.append(f"Momentálna cena minimálnej kostry grafu je {mst_cost}")
+            steps_log.append(f"Momentálna váha minimálnej kostry grafu je {mst_cost}")
             logs.append(steps_log)
             mst = {e: True for e in mst_edges}
             cyclic = {e: False for e in cyclic_edges}
@@ -193,7 +193,7 @@ class Algorithms:
 
         final_step_logs = []
         final_step_logs.append("Všetky vrcholy boli navštívené, hrany tvoriace minimálnu kostru sú zvýraznené")
-        final_step_logs.append(f"Celková cena minimálnej kostry grafu je {mst_cost}")
+        final_step_logs.append(f"Celková váha minimálnej kostry grafu je {mst_cost}")
 
         logs.append(final_step_logs)
         edges_logs.append({e: True for e in mst_edges})
@@ -262,7 +262,7 @@ class Algorithms:
 
             mst_cost += weight
             step_log.append("Kružnica nevznikla, hranu pridávam do minimálnej kostry grafu")
-            step_log.append(f"Momentálna cena minimálnej kostry grafu je {mst_cost}")
+            step_log.append(f"Momentálna váha minimálnej kostry grafu je {mst_cost}")
             logs.append(step_log)
             mst_edges.append(edge)
             mst = {e: True for e in mst_edges}
@@ -277,7 +277,7 @@ class Algorithms:
 
         final_step_logs = []
         final_step_logs.append("Všetky hrany boli skontrolované, hrany ktoré boli pridané do minimálnej kostry grafu sú zvýraznené")
-        final_step_logs.append(f"Celková cena minimálnej kostry grafu je {mst_cost}")
+        final_step_logs.append(f"Celková váha minimálnej kostry grafu je {mst_cost}")
         logs.append(final_step_logs)
         edges_logs.append({e: True for e in mst_edges})
         vertices_logs.append({})
