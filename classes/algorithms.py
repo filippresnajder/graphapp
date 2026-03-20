@@ -50,7 +50,7 @@ class Algorithms:
                     continue
 
                 if edge not in edges_visited:
-                    step_log.append(f"Skúmam hranu {current.tag} {('->' if edge.orientation == "yes" else '-')} {neighbour.tag} (váha {edge.weight})")
+                    step_log.append(f"Skúmam hranu {current.tag} {('->' if edge.orientation == 'yes' else '-')} {neighbour.tag} (váha {edge.weight})")
 
                 new_dist = current_dist + edge.weight
 

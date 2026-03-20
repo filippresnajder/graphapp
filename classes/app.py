@@ -14,10 +14,10 @@ from classes.infobox import Infobox
 from classes.user_interface import UserInterface
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR,
                        DEFAULT_BUTTON_COLOR, DEFAULT_DROPDOWN_BUTTON_COLOR, DEFAULT_TEXT_COLOR,
-                       DEFAULT_ALGORITHM_FILL, DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
+                       DEFAULT_ALGORITHM_FILL, DEFAULT_ALGORITHM_NOT_FOCUSED, DEFAULT_ALGORITHM_NOT_SELECTED, 
+                       DEFAULT_WIDTH, VERTEX_TAG, EDGE_TAG)
 
 # TODO: Write info about algorithms in algorithm info
-# TODO: Vyraznejsie znacenie algoritmov krokov ako sa vyfarbuju hrany (Width x2 a farba zelena)
 # TODO: Implement test section
 
 # LATER TODO: Zdroje k pseudokodom
@@ -221,11 +221,14 @@ class App:
         self.infobox.log(f"Výsledky sedia - cesta {path_tag}")
         self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu.")
 
-        for edge in edge_objects:
-            v1, v2 = edge.vertices
-            self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
-            self.canvas.itemconfig(v1.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
-            self.canvas.itemconfig(v2.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+        for edge in self.edges:
+            if edge in edge_objects:
+                v1, v2 = edge.vertices
+                self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+                self.canvas.itemconfig(v1.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+                self.canvas.itemconfig(v2.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+            else:
+                self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_NOT_FOCUSED)
 
         self.algorithm_state = {
             "index": -1, 
@@ -305,11 +308,14 @@ class App:
             "is_bfs_or_dfs": False       
         }
 
-        for edge in mst_edges:
-            v1, v2 = edge.vertices
-            self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
-            self.canvas.itemconfig(v1.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
-            self.canvas.itemconfig(v2.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+        for edge in self.edges:
+            if edge in mst_edges:
+                v1, v2 = edge.vertices
+                self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+                self.canvas.itemconfig(v1.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+                self.canvas.itemconfig(v2.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+            else:
+                self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_NOT_FOCUSED)
 
         self.state = None
 
@@ -367,8 +373,11 @@ class App:
             "is_bfs_or_dfs": False       
         }
 
-        for edge in mst_edges:
-            self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+        for edge in self.edges:
+            if edge in mst_edges:
+                self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+            else:
+                self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_NOT_FOCUSED)
 
         self.state = None
 
@@ -562,8 +571,11 @@ class App:
             self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")
             for vertex in self.vertices:
                 self.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
-            for edge in used_edges:
-                self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+            for edge in self.edges:
+                if edge in used_edges:
+                    self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+                else:
+                    self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_NOT_FOCUSED)
 
         self.algorithm_state = {
             "index": -1, 
@@ -616,8 +628,11 @@ class App:
         for vertex in path:
             self.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
 
-        for edge in used_edges:
-            self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+        for edge in self.edges:
+            if edge in used_edges:
+                self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+            else:
+                self.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_NOT_FOCUSED)
 
         if len(used_edges) != len(self.edges):
             self.infobox.log(f"Eulerov ťah z vrcholu {start_vertex} neexistuje")
@@ -764,13 +779,18 @@ class App:
 
         if not self.algorithm_state["is_bfs_or_dfs"]:
             edges = self.algorithm_state["steps"]["edges"][self.algorithm_state["index"]]
+            for edge in self.edges:
+                self.canvas.itemconfig(edge.canvas_object_id,
+                                       fill=DEFAULT_ALGORITHM_NOT_FOCUSED)
             for edge, state in edges.items():
                 if state:
                     self.canvas.itemconfig(edge.canvas_object_id, 
                                            fill=DEFAULT_ALGORITHM_FILL)
                 else:
                     self.canvas.itemconfig(edge.canvas_object_id,
-                                           fill="red")
+                                           fill=DEFAULT_ALGORITHM_NOT_SELECTED)
+                    
+            
 
         vertices = self.algorithm_state["steps"]["vertices"][self.algorithm_state["index"]]
         for vertex, state in vertices.items():
