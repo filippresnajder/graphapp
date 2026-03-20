@@ -532,13 +532,15 @@ class App:
         nx_g = self.build_nx_graph()
 
         if not nx.has_eulerian_path(nx_g):
+            self.infobox.clear()
             self.infobox.log("Chyba: V grafe nie sú splnené podmienky pre Eulerov ťah")
             self.state = None
             return
         
-        self.infobox.log("V grafe sú splnené podmienky pre Eulerov ťah")
-        
         logs, edge_logs, vertices_logs, path, used_edges = self.algorithms.eulerian_path(start_vertex)
+
+        self.infobox.log("V grafe sú splnené podmienky pre Eulerov ťah")
+        self.infobox.log(f"Kontrolujem, či existuje Eulerov ťah z počiatočného vrcholu {start_vertex}")
 
         for vertex in path:
             self.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
@@ -551,7 +553,7 @@ class App:
             self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")
         else:
             self.infobox.log(f"Eulerov ťah z vrcholu {start_vertex} existuje")
-            self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")         
+            self.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")        
 
         self.algorithm_state = {
             "index": -1, 
