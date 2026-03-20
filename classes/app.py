@@ -537,7 +537,7 @@ class App:
             return
         
         self.infobox.log("V grafe sú splnené podmienky pre Eulerov ťah")
-
+        
         logs, edge_logs, vertices_logs, path, used_edges = self.algorithms.eulerian_path(start_vertex)
 
         for vertex in path:
