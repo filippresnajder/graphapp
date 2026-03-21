@@ -17,8 +17,8 @@ class Edge:
         self.vertices = [first_vertex, second_vertex]
         self.curve_offset = self.__calculate_initial_offset()
         self.canvas_object_id = self.__create_line(orientation)
-        self.canvas_text_bg = self.app.canvas.create_rectangle(self.get_center_x()-BOX_SIZE, self.get_center_y()-BOX_SIZE, self.get_center_x()+BOX_SIZE, self.get_center_y()+BOX_SIZE, fill="white", outline=box_color, tags=EDGE_LABEL_TAG)
-        self.canvas_text = self.app.canvas.create_text(self.get_center_x(), self.get_center_y(), fill=text_color, text=self.weight, font=("Arial", 8), tags=EDGE_LABEL_TAG)
+        self.canvas_text_bg = self.app.main_view.canvas.create_rectangle(self.get_center_x()-BOX_SIZE, self.get_center_y()-BOX_SIZE, self.get_center_x()+BOX_SIZE, self.get_center_y()+BOX_SIZE, fill="white", outline=box_color, tags=EDGE_LABEL_TAG)
+        self.canvas_text = self.app.main_view.canvas.create_text(self.get_center_x(), self.get_center_y(), fill=text_color, text=self.weight, font=("Arial", 8), tags=EDGE_LABEL_TAG)
         self.app.update_layers()
         self.update_position()
         Edge.identifier += 1
@@ -39,15 +39,15 @@ class Edge:
             x2, y2 = self.__calculate_position_with_arrow(self.vertices[0], self.vertices[1])
         
         points = self.__create_self_loop() if self.__is_self_loop() else self.__calculate_curve_points(x1, y1, x2, y2) 
-        self.app.canvas.coords(self.canvas_object_id, points)
+        self.app.main_view.canvas.coords(self.canvas_object_id, points)
 
         weight_label_x, weight_label_y = self.__get_curve_midpoint(points)
-        self.app.canvas.coords(self.canvas_text_bg, weight_label_x - BOX_SIZE, weight_label_y - BOX_SIZE, weight_label_x + BOX_SIZE, weight_label_y + BOX_SIZE)
-        self.app.canvas.coords(self.canvas_text, weight_label_x, weight_label_y)
+        self.app.main_view.canvas.coords(self.canvas_text_bg, weight_label_x - BOX_SIZE, weight_label_y - BOX_SIZE, weight_label_x + BOX_SIZE, weight_label_y + BOX_SIZE)
+        self.app.main_view.canvas.coords(self.canvas_text, weight_label_x, weight_label_y)
 
     def __create_line(self, orientation):
         arrow = tk.LAST if orientation == "yes" or self.vertices[0] != self.vertices[1] else None
-        return self.app.canvas.create_line(
+        return self.app.main_view.canvas.create_line(
             0, 0, 0, 0,
             fill=self.line_color,
             width=self.width,
@@ -131,12 +131,12 @@ class Edge:
         except ValueError:
             return "weight-error"
         self.line_color, self.box_color, self.weight_color = line, box, text
-        self.app.canvas.itemconfig(self.canvas_object_id, fill=self.line_color)
-        self.app.canvas.itemconfig(self.canvas_text_bg, outline=self.box_color)
-        self.app.canvas.itemconfig(self.canvas_text, fill=self.weight_color, text=self.weight)   
+        self.app.main_view.canvas.itemconfig(self.canvas_object_id, fill=self.line_color)
+        self.app.main_view.canvas.itemconfig(self.canvas_text_bg, outline=self.box_color)
+        self.app.main_view.canvas.itemconfig(self.canvas_text, fill=self.weight_color, text=self.weight)   
         if self.app.algorithm_state["steps"]:
-            self.app.infobox.clear()
-            self.app.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
+            self.app.main_view.infobox.clear()
+            self.app.main_view.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
             self.app.reset_vertices_and_edges(event=None)
         self.app.clear_algorithm_state()
 
@@ -144,13 +144,13 @@ class Edge:
         if self not in self.app.edges:
             return
 
-        self.app.canvas.delete(self.canvas_object_id)
-        self.app.canvas.delete(self.canvas_text_bg)
-        self.app.canvas.delete(self.canvas_text)
+        self.app.main_view.canvas.delete(self.canvas_object_id)
+        self.app.main_view.canvas.delete(self.canvas_text_bg)
+        self.app.main_view.canvas.delete(self.canvas_text)
         self.app.edges.remove(self)
         if self.app.algorithm_state["steps"]:
-            self.app.infobox.clear()
-            self.app.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
+            self.app.main_view.infobox.clear()
+            self.app.main_view.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
             self.app.reset_vertices_and_edges(event=None)
         self.app.clear_algorithm_state()
 

@@ -6,11 +6,11 @@ class Algorithms:
         self.app = app
     
     def dijkstra(self, start_vertex, end_vertex):
-        self.app.infobox.clear()
-        self.app.infobox.log("Spúšťam vizualizáciu Dijkstrovho algoritmu")
+        self.app.main_view.infobox.clear()
+        self.app.main_view.infobox.log("Spúšťam vizualizáciu Dijkstrovho algoritmu")
 
         if self.__contains_negative_weight():
-            self.app.infobox.log("Chyba: Dijkstrov algoritmus nie je možné spusiť v grafe so zápornými hranami")
+            self.app.main_view.infobox.log("Chyba: Dijkstrov algoritmus nie je možné spusiť v grafe so zápornými hranami")
             return False
         
         logs = []
@@ -122,11 +122,11 @@ class Algorithms:
         return (path, path_tag, edge_objects, logs, edges_logs, vertices_logs)
     
     def prim(self, start_vertex):
-        self.app.infobox.clear()
-        self.app.infobox.log("Spúšťam vizualizáciu Primovho algoritmu")
+        self.app.main_view.infobox.clear()
+        self.app.main_view.infobox.log("Spúšťam vizualizáciu Primovho algoritmu")
 
         if self.__is_graph_oriented():
-            self.app.infobox.log("Chyba: Primov algoritmus nefunguje na orientované grafy")
+            self.app.main_view.infobox.log("Chyba: Primov algoritmus nefunguje na orientované grafy")
             return False
 
         visited = set()
@@ -202,12 +202,12 @@ class Algorithms:
         return (mst_edges, mst_cost, logs, edges_logs, vertex_logs)
     
     def kruskal(self):
-        self.app.infobox.clear()
+        self.app.main_view.infobox.clear()
 
-        self.app.infobox.log("Spúšťam Kruskalov algoritmus")
+        self.app.main_view.infobox.log("Spúšťam Kruskalov algoritmus")
 
         if self.__is_graph_oriented():
-            self.app.infobox.log("Chyba: Kruskalov algoritmus nefunguje na orientované grafy")
+            self.app.main_view.infobox.log("Chyba: Kruskalov algoritmus nefunguje na orientované grafy")
             return False
         
         logs = []
@@ -285,12 +285,12 @@ class Algorithms:
         return (mst_edges, mst_cost, logs, edges_logs, vertices_logs)
     
     def bfs(self, start_vertex):
-        self.app.infobox.clear()
+        self.app.main_view.infobox.clear()
         queue = deque()
         visited = set()
         tree_edges = []
 
-        self.app.infobox.log("Spúšťam algoritmus BFS")
+        self.app.main_view.infobox.log("Spúšťam algoritmus BFS")
 
         logs = []
         vertices_logs = []
@@ -362,12 +362,12 @@ class Algorithms:
         return (tree_edges, visited_number, logs, edges_logs, vertices_logs)
     
     def dfs(self, start_vertex):
-        self.app.infobox.clear()
+        self.app.main_view.infobox.clear()
         visited = set()
         tree_edges = []
         counter = 1
 
-        self.app.infobox.log("Spúšťam algoritmus DFS")
+        self.app.main_view.infobox.log("Spúšťam algoritmus DFS")
         
         logs = []
         edges_logs = []
@@ -435,8 +435,8 @@ class Algorithms:
         return (tree_edges, visited_number, logs, edges_logs, vertices_logs)
 
     def floyd_warshall(self):
-        self.app.infobox.clear()
-        self.app.infobox.log("Spúšťam Floyd-Warshallov algoritmus")
+        self.app.main_view.infobox.clear()
+        self.app.main_view.infobox.log("Spúšťam Floyd-Warshallov algoritmus")
 
         logs = []
         edge_logs = []
@@ -507,7 +507,7 @@ class Algorithms:
 
         for vertex in self.app.vertices:
             if vertex.edges and distances[vertex][vertex] < 0:
-                self.app.infobox.log("Chyba: Graf obsahuje negatívny cyklus")
+                self.app.main_view.infobox.log("Chyba: Graf obsahuje negatívny cyklus")
                 return None
 
         converted = {v.id: {u.id: distances[v][u] for u in distances[v]} for v in distances}
@@ -530,8 +530,8 @@ class Algorithms:
 
 
     def hamilton_cycle(self):
-        self.app.infobox.clear()
-        self.app.infobox.log("Spúšťam algoritmus hľadania Hamiltonovej kružnice")
+        self.app.main_view.infobox.clear()
+        self.app.main_view.infobox.log("Spúšťam algoritmus hľadania Hamiltonovej kružnice")
         
         if len(self.app.vertices) > 6:
             return
@@ -611,8 +611,8 @@ class Algorithms:
         return logs, edge_logs, vertices_logs, None, None
 
     def eulerian_path(self, start_vertex):
-        self.app.infobox.clear()
-        self.app.infobox.log("Spúšťam algoritmus Eulerovho ťahu")
+        self.app.main_view.infobox.clear()
+        self.app.main_view.infobox.log("Spúšťam algoritmus Eulerovho ťahu")
 
         logs = []
         edge_logs = []
@@ -666,40 +666,40 @@ class Algorithms:
         return logs, edge_logs, vertices_logs, path, used_edges
 
     def dijkstra_info(self):
-        self.app.infobox.clear()
-        self.app.infobox.log("Informácie o Dijkstrovom algoritme.")
+        self.app.main_view.infobox.clear()
+        self.app.main_view.infobox.log("Informácie o Dijkstrovom algoritme.")
 
     def prim_info(self):
-        self.app.infobox.clear()
-        self.app.infobox.log("Informácie o Primovom algoritme.")
+        self.app.main_view.infobox.clear()
+        self.app.main_view.infobox.log("Informácie o Primovom algoritme.")
 
     def kruskal_info(self):
-        self.app.infobox.clear()
-        self.app.infobox.log("Informácie o Kruskalovom algoritme.")
+        self.app.main_view.infobox.clear()
+        self.app.main_view.infobox.log("Informácie o Kruskalovom algoritme.")
 
     def dfs_info(self):
-        self.app.infobox.clear()
-        self.app.infobox.log("Informácie o DFS algoritme.")
+        self.app.main_view.infobox.clear()
+        self.app.main_view.infobox.log("Informácie o DFS algoritme.")
 
     def bfs_info(self):
-        self.app.infobox.clear()
-        self.app.infobox.log("Informácie o BFS algoritme.")
+        self.app.main_view.infobox.clear()
+        self.app.main_view.infobox.log("Informácie o BFS algoritme.")
 
     def a_star_info(self):
-        self.app.infobox.clear()
-        self.app.infobox.log("Informácie o A Star algoritme.")
+        self.app.main_view.infobox.clear()
+        self.app.main_view.infobox.log("Informácie o A Star algoritme.")
 
     def floyd_warshall_info(self):
-        self.app.infobox.clear()
-        self.app.infobox.log("Informácie o Floyd-Warshallovom algoritme.")
+        self.app.main_view.infobox.clear()
+        self.app.main_view.infobox.log("Informácie o Floyd-Warshallovom algoritme.")
 
     def hamilton_cycle_info(self):
-        self.app.infobox.clear()
-        self.app.infobox.log("Informácie o Hamiltonovej kružnici.")
+        self.app.main_view.infobox.clear()
+        self.app.main_view.infobox.log("Informácie o Hamiltonovej kružnici.")
 
     def euler_path_info(self):
-        self.app.infobox.clear()
-        self.app.infobox.log("Informácie o Eulerovom ťahu.")
+        self.app.main_view.infobox.clear()
+        self.app.main_view.infobox.log("Informácie o Eulerovom ťahu.")
 
     
     def __is_graph_oriented(self):

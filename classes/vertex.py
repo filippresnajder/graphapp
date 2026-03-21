@@ -12,9 +12,9 @@ class Vertex:
         self.text_color = text_color
         self.width = width
         self.edges = []
-        self.canvas_object_id = self.app.canvas.create_oval(coords, fill=self.fill_color, outline=self.outline_color, width=width, tags=VERTEX_TAG)
-        self.canvas_text = self.app.canvas.create_text(self.get_center_x(), self.get_center_y(), fill=self.text_color, text=self.tag, font=("Arial", 12), tags=VERTEX_TAG)
-        self.dfs_bfs_order = self.app.canvas.create_text(self.get_center_x(), self.get_center_y() - (RADIUS * 1.5), fill="", text="", font=("Arial", 12))
+        self.canvas_object_id = self.app.main_view.canvas.create_oval(coords, fill=self.fill_color, outline=self.outline_color, width=width, tags=VERTEX_TAG)
+        self.canvas_text = self.app.main_view.canvas.create_text(self.get_center_x(), self.get_center_y(), fill=self.text_color, text=self.tag, font=("Arial", 12), tags=VERTEX_TAG)
+        self.dfs_bfs_order = self.app.main_view.canvas.create_text(self.get_center_x(), self.get_center_y() - (RADIUS * 1.5), fill="", text="", font=("Arial", 12))
         Vertex.identifier += 1
 
     def is_clicked(self, x, y):
@@ -27,13 +27,13 @@ class Vertex:
         return (self.coords[1] + self.coords[3]) / 2
     
     def move_to(self, nx, ny):
-        x1, y1, x2, y2 = self.app.canvas.coords(self.canvas_object_id)
+        x1, y1, x2, y2 = self.app.main_view.canvas.coords(self.canvas_object_id)
         r = (x2 - x1) / 2
 
         self.coords = (nx-r, ny-r, nx+r, ny+r)
-        self.app.canvas.coords(self.canvas_object_id, self.coords)
-        self.app.canvas.coords(self.canvas_text, nx, ny)
-        self.app.canvas.coords(self.dfs_bfs_order, nx, ny - (RADIUS * 1.5))
+        self.app.main_view.canvas.coords(self.canvas_object_id, self.coords)
+        self.app.main_view.canvas.coords(self.canvas_text, nx, ny)
+        self.app.main_view.canvas.coords(self.dfs_bfs_order, nx, ny - (RADIUS * 1.5))
 
         for edge in self.edges:
             if self in edge.vertices:
@@ -42,11 +42,11 @@ class Vertex:
     def update(self, tag, fill, outline, text):
         self.tag = tag[0:20]
         self.fill_color, self.outline_color, self.text_color = fill, outline, text
-        self.app.canvas.itemconfig(self.canvas_object_id, fill=self.fill_color, outline=self.outline_color)
-        self.app.canvas.itemconfig(self.canvas_text, fill=self.text_color, text=self.tag)
+        self.app.main_view.canvas.itemconfig(self.canvas_object_id, fill=self.fill_color, outline=self.outline_color)
+        self.app.main_view.canvas.itemconfig(self.canvas_text, fill=self.text_color, text=self.tag)
         if self.app.algorithm_state["steps"]:
-            self.app.infobox.clear()
-            self.app.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
+            self.app.main_view.infobox.clear()
+            self.app.main_view.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
             self.app.reset_vertices_and_edges(event=None)
         self.app.clear_algorithm_state()
 
@@ -54,8 +54,8 @@ class Vertex:
         for edge in self.edges[:]:
             edge.delete()
 
-        self.app.canvas.delete(self.canvas_object_id)
-        self.app.canvas.delete(self.canvas_text)
+        self.app.main_view.canvas.delete(self.canvas_object_id)
+        self.app.main_view.canvas.delete(self.canvas_text)
 
         if self in self.app.vertices:
             self.app.vertices.remove(self)
@@ -64,8 +64,8 @@ class Vertex:
             self.app.canvas_id_to_vertex.pop(cid, None)
 
         if self.app.algorithm_state["steps"]:
-            self.app.infobox.clear()
-            self.app.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
+            self.app.main_view.infobox.clear()
+            self.app.main_view.infobox.log("Nastala zmena v grafe, mažem pamäť krokov predošlého algoritmu")
             self.app.reset_vertices_and_edges(event=None)
         self.app.clear_algorithm_state()
 
