@@ -1067,7 +1067,7 @@ class App:
         for q in self.autotest_view.questions:
             random.shuffle(q["answers"])
 
-        self.autotest_view.questions = self.autotest_view.questions[:20]
+        self.autotest_view.questions = self.autotest_view.questions[:NUM_AUTOTEST_QUESTION]
 
         for question in self.autotest_view.questions:
             for answer in question["answers"]:

@@ -16,10 +16,10 @@
             "question": "Ktorý algoritmus nájde najkratšiu cestu v grafe?",
             "image": null,
             "answers": [
-                {"id": 1, "text": "BFS", "correct": false},
-                {"id": 2, "text": "DFS", "correct": false},
-                {"id": 3, "text": "Dijkstra", "correct": true},
-                {"id": 4, "text": "Prim", "correct": false}
+                {"id": 3, "text": "BFS", "correct": false},
+                {"id": 4, "text": "DFS", "correct": false},
+                {"id": 5, "text": "Dijkstra", "correct": true},
+                {"id": 6, "text": "Prim", "correct": false}
             ]
         },
         {
@@ -28,10 +28,10 @@
             "question": "Ktorý algoritmus slúži na prehľadávanie do šírky?",
             "image": null,
             "answers": [
-                {"id": 1, "text": "BFS", "correct": true},
-                {"id": 2, "text": "DFS", "correct": false},
-                {"id": 3, "text": "Kruskal", "correct": false},
-                {"id": 4, "text": "Prim", "correct": false}
+                {"id": 7, "text": "BFS", "correct": true},
+                {"id": 8, "text": "DFS", "correct": false},
+                {"id": 9, "text": "Kruskal", "correct": false},
+                {"id": 10, "text": "Prim", "correct": false}
             ]  
         },
         {
@@ -40,10 +40,10 @@
             "question": "Ktorý algoritmus slúži na nájdenie minimálnej kostry grafu?",
             "image": null,
             "answers": [
-                {"id": 1, "text": "Floyd-Warshall", "correct": false},
-                {"id": 2, "text": "Eulerov ťah", "correct": false},
-                {"id": 3, "text": "Kruskal", "correct": true},
-                {"id": 4, "text": "Prim", "correct": true}
+                {"id": 11, "text": "Floyd-Warshall", "correct": false},
+                {"id": 12, "text": "Eulerov ťah", "correct": false},
+                {"id": 13, "text": "Kruskal", "correct": true},
+                {"id": 14, "text": "Prim", "correct": true}
             ]
         },
         {
@@ -52,8 +52,8 @@
             "question": "Dijkstrov algoritmus slúži na nájdenie najkratšej cesty v grafe.",
             "image": null,
             "answers": [
-                {"id": 1, "text": "Pravda", "correct": true},
-                {"id": 2, "text": "Nepravda", "correct": false}
+                {"id": 15, "text": "Pravda", "correct": true},
+                {"id": 16, "text": "Nepravda", "correct": false}
             ]  
         },
         {
@@ -62,8 +62,8 @@
             "question": "Kruskalov algoritmus funguje tak, že si najprv zoradí všetky hrany v grafe podľa váhy vzostupne a následne ich pridáva do minimálnej kostry grafu tak, aby nevznikla kružnica.",
             "image": null,
             "answers": [
-                {"id": 1, "text": "Pravda", "correct": true},
-                {"id": 2, "text": "Nepravda", "correct": false}
+                {"id": 17, "text": "Pravda", "correct": true},
+                {"id": 18, "text": "Nepravda", "correct": false}
             ]
         },
         {
@@ -72,10 +72,10 @@
             "question": "Ktorý algoritmus slúži na prehľadávanie do hĺbky?",
             "image": null,
             "answers": [
-                {"id": 1, "text": "BFS", "correct": false},
-                {"id": 2, "text": "DFS", "correct": true},
-                {"id": 3, "text": "Kruskal", "correct": false},
-                {"id": 4, "text": "Prim", "correct": false}
+                {"id": 19, "text": "BFS", "correct": false},
+                {"id": 20, "text": "DFS", "correct": true},
+                {"id": 21, "text": "Kruskal", "correct": false},
+                {"id": 22, "text": "Prim", "correct": false}
             ]  
         },
         {
@@ -84,8 +84,8 @@
             "question": "Cesta okolo grafu, kde navštívime všetky vrcholy iba raz a skončíme v začiatočnom vrchole nazývame Hamiltonova kružnica",
             "image": null,
             "answers": [
-                {"id": 1, "text": "Pravda", "correct": true},
-                {"id": 2, "text": "Nepravda", "correct": false}
+                {"id": 23, "text": "Pravda", "correct": true},
+                {"id": 24, "text": "Nepravda", "correct": false}
             ]  
         },
         {
@@ -94,8 +94,8 @@
             "question": "Cesta okolo grafu, kde navštívime všetky hrany iba raz nazývame Eulerov ťah",
             "image": null,
             "answers": [
-                {"id": 1, "text": "Pravda", "correct": true},
-                {"id": 2, "text": "Nepravda", "correct": false}
+                {"id": 25, "text": "Pravda", "correct": true},
+                {"id": 26, "text": "Nepravda", "correct": false}
             ]  
         },
         {
@@ -104,10 +104,10 @@
             "question": "Algoritmy, ktoré slúžia na nájdenie najkratšej cesty v grafe sú:",
             "image": null,
             "answers": [
-                {"id": 1, "text": "Floyd-Warshall", "correct": true},
-                {"id": 2, "text": "Eulerov ťah", "correct": false},
-                {"id": 3, "text": "Dijkstra", "correct": true},
-                {"id": 4, "text": "Prim", "correct": false}
+                {"id": 27, "text": "Floyd-Warshall", "correct": true},
+                {"id": 28, "text": "Eulerov ťah", "correct": false},
+                {"id": 29, "text": "Dijkstra", "correct": true},
+                {"id": 30, "text": "Prim", "correct": false}
             ]
         },
         {
@@ -116,8 +116,8 @@
             "question": "Primov algoritmus je greedy algoritmus.",
             "image": null,
             "answers": [
-                {"id": 1, "text": "Pravda", "correct": true},
-                {"id": 2, "text": "Nepravda", "correct": false}
+                {"id": 31, "text": "Pravda", "correct": true},
+                {"id": 32, "text": "Nepravda", "correct": false}
             ]  
         },
         {
@@ -126,9 +126,9 @@
             "question": "Vrcholy budú navštívené po použití algoritmu DFS nasledovne:",
             "image": "image_2.png",
             "answers": [
-                {"id": 1, "text": "1,2,4,5,3", "correct": true},
-                {"id": 2, "text": "1,2,3,4,5", "correct": false},
-                {"id": 3, "text": "1,2,4,3,5", "correct": false}
+                {"id": 33, "text": "1,2,4,5,3", "correct": true},
+                {"id": 34, "text": "1,2,3,4,5", "correct": false},
+                {"id": 35, "text": "1,2,4,3,5", "correct": false}
             ]
         },
         {
@@ -137,9 +137,9 @@
             "question": "Vrcholy budú navštívené po použití algoritmu BFS nasledovne:",
             "image": "image_2.png",
             "answers": [
-                {"id": 1, "text": "1,2,3,4,5", "correct": true},
-                {"id": 2, "text": "1,2,4,3,5", "correct": false},
-                {"id": 3, "text": "1,2,4,5,3", "correct": false}
+                {"id": 36, "text": "1,2,3,4,5", "correct": true},
+                {"id": 37, "text": "1,2,4,3,5", "correct": false},
+                {"id": 38, "text": "1,2,4,5,3", "correct": false}
             ]
         },
         {
@@ -148,8 +148,8 @@
             "question": "Použili sme algoritmus, jeho výsledok je Hamiltonova kružnica.",
             "image": "image_3.png",
             "answers": [
-                {"id": 1, "text": "Pravda", "correct": true},
-                {"id": 2, "text": "Nepravda", "correct": false}
+                {"id": 39, "text": "Pravda", "correct": true},
+                {"id": 40, "text": "Nepravda", "correct": false}
             ]
         },
         {
@@ -158,8 +158,8 @@
             "question": "Z vrcholu 1 bol aplikovaný algoritmus. Jeho výsledok je Eulerov ťah.",
             "image": "image_4.png",
             "answers": [
-                {"id": 1, "text": "Pravda", "correct": false},
-                {"id": 2, "text": "Nepravda", "correct": true}
+                {"id": 41, "text": "Pravda", "correct": false},
+                {"id": 42, "text": "Nepravda", "correct": true}
             ]
         },
         {
@@ -168,8 +168,8 @@
             "question": "Z vrcholu 3 bol aplikovaný algoritmus. Jeho výsledok je Eulerov ťah.",
             "image": "image_5.png",
             "answers": [
-                {"id": 1, "text": "Pravda", "correct": true},
-                {"id": 2, "text": "Nepravda", "correct": false}
+                {"id": 43, "text": "Pravda", "correct": true},
+                {"id": 44, "text": "Nepravda", "correct": false}
             ]
         },
         {
@@ -178,8 +178,8 @@
             "question": "Výsledok daného algoritmu, ktorý bol aplikovaný je minimálna kostra grafu.",
             "image": "image_6.png",
             "answers": [
-                {"id": 1, "text": "Pravda", "correct": true},
-                {"id": 2, "text": "Nepravda", "correct": false}
+                {"id": 45, "text": "Pravda", "correct": true},
+                {"id": 46, "text": "Nepravda", "correct": false}
             ]
         },
         {
@@ -188,10 +188,10 @@
             "question": "Daný výsledok vieme dosiahnuť aplikovaním algoritmov:",
             "image": "image_6.png",
             "answers": [
-                {"id": 1, "text": "Floyd-Warshall", "correct": false},
-                {"id": 2, "text": "Dijkstra", "correct": false},
-                {"id": 3, "text": "Kruskal", "correct": true},
-                {"id": 4, "text": "Prim", "correct": true}
+                {"id": 47, "text": "Floyd-Warshall", "correct": false},
+                {"id": 48, "text": "Dijkstra", "correct": false},
+                {"id": 49, "text": "Kruskal", "correct": true},
+                {"id": 50, "text": "Prim", "correct": true}
             ]
         },
         {
@@ -200,9 +200,9 @@
             "question": "Najkratšia cesta z vrcholu 1 do vrcholu 4 je:",
             "image": "image_7.png",
             "answers": [
-                {"id": 1, "text": "[1-4]", "correct": true},
-                {"id": 2, "text": "[1-2-4]", "correct": true},
-                {"id": 3, "text": "[1-2-3-4]", "correct": false}
+                {"id": 51, "text": "[1-4]", "correct": true},
+                {"id": 52, "text": "[1-2-4]", "correct": true},
+                {"id": 53, "text": "[1-2-3-4]", "correct": false}
             ]
         },
         {
@@ -211,9 +211,9 @@
             "question": "Najkratšia cesta z vrcholu 3 do vrcholu 1 má celkovú váhu:",
             "image": "image_7.png",
             "answers": [
-                {"id": 1, "text": "2", "correct": false},
-                {"id": 2, "text": "4", "correct": true},
-                {"id": 3, "text": "3", "correct": false}
+                {"id": 54, "text": "2", "correct": false},
+                {"id": 55, "text": "4", "correct": true},
+                {"id": 56, "text": "3", "correct": false}
             ]
         }
     ]
