@@ -78,10 +78,12 @@ class MainFrame(tk.Frame):
         self.import_graph_button = Button(self, self.app, "import_graph",
                                           "Import grafu", DEFAULT_BUTTON_COLOR)
         self.autotest_button = Button(self, self.app, "autotest", 
-                                      "Autotesty", DEFAULT_BUTTON_COLOR)
+                                      "Autotest", DEFAULT_BUTTON_COLOR)
         self.top_left_ui_group = UserInterface([self.export_graph_button,
                                                 self.import_graph_button,
                                                 self.autotest_button], 20, 20, 110)
         self.infobox = Infobox(self.app, 240, 610, 20, 50)
+        self.shortcuts = tk.Label(self, text="Klávesové skratky: R: Resetovanie zafarbenia grafu po výpočte algoritmu | CTRL+D: Vymazanie grafu | CTRL+Scroll: Zoom | Pravý klik na hranu/vrchol: Úprava objektu")
+        self.shortcuts.place(x=280, y=695)
         self.canvas.tag_bind(VERTEX_TAG, "<Button-3>", self.app.edit_vertex)
         self.canvas.tag_bind(EDGE_TAG, "<Button-3>", self.app.edit_edge)

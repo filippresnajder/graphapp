@@ -1,0 +1,70 @@
+{
+    "questions": [
+        {
+            "id": 1,
+            "type": "single_choice",
+            "question": "Zvýraznená cesta v grafe je najkratšia cesta z vrcholu 1 do vrcholu 5.",
+            "image": null,
+            "answers": [
+                {"id": 1, "text": "Pravda", "correct": false},
+                {"id": 2, "text": "Nepravda", "correct": true}
+            ]
+        },
+        {
+            "id": 2,
+            "type": "single_choice",
+            "question": "Ktorý algoritmus nájde najkratšiu cestu v grafe?",
+            "image": null,
+            "answers": [
+                {"id": 1, "text": "BFS", "correct": false},
+                {"id": 2, "text": "DFS", "correct": false},
+                {"id": 3, "text": "Dijkstra", "correct": true},
+                {"id": 4, "text": "Prim", "correct": false}
+            ]
+        },
+        {
+            "id": 3,
+            "type": "single_choice",
+            "question": "Ktorý algoritmus slúži na prehľadávanie do šírky?",
+            "image": null,
+            "answers": [
+                {"id": 1, "text": "BFS", "correct": true},
+                {"id": 2, "text": "DFS", "correct": false},
+                {"id": 3, "text": "Kruskal", "correct": false},
+                {"id": 4, "text": "Prim", "correct": false}
+            ]  
+        },
+        {
+            "id": 4,
+            "type": "multiple_choice",
+            "question": "Ktorý algoritmus slúži na nájdenie minimálnej kostry grafu?",
+            "image": null,
+            "answers": [
+                {"id": 1, "text": "Floyd-Warshall", "correct": false},
+                {"id": 2, "text": "Eulerov ťah", "correct": false},
+                {"id": 3, "text": "Kruskal", "correct": true},
+                {"id": 4, "text": "Prim", "correct": true}
+            ]
+        },
+        {
+            "id": 5,
+            "type": "single_choice",
+            "question": "Dijkstrov algoritmus slúži na nájdenie najkratšej cesty v grafe.",
+            "image": null,
+            "answers": [
+                {"id": 1, "text": "Pravda", "correct": true},
+                {"id": 2, "text": "Nepravda", "correct": false}
+            ]  
+        },
+        {
+            "id": 6,
+            "type": "single_choice",
+            "question": "Kruskalov algoritmus funguje tak, že si najprv zoradí všetky hrany v grafe podľa váhy vzostupne a následne ich pridáva do minimálnej kostry grafu tak, aby nevznikla kružnica.",
+            "image": null,
+            "answers": [
+                {"id": 1, "text": "Pravda", "correct": true},
+                {"id": 2, "text": "Nepravda", "correct": false}
+            ]
+        }
+    ]
+}

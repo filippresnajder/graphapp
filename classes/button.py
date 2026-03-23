@@ -3,7 +3,8 @@ import tkinter as tk
 button_sizes = {"extra_small": 4,
                 "small": 6,
                 "medium": 8,
-                "large": 12}
+                "large": 12,
+                "extra_large": 16}
 
 class Button:
     def __init__(self, parent, app, btn_type, label, color, size="large"):
@@ -46,7 +47,8 @@ class Button:
             "export_graph": self.__handle_export_graph,
             "import_graph": self.__handle_import_graph,
             "autotest": self.__handle_autotest,
-            "back_to_main_menu": self.__handle_back_to_main_menu
+            "back_to_main_menu": self.__handle_back_to_main_menu,
+            "next_question": self.__handle_next_question
         } 
 
     def place(self, x, y):
@@ -203,7 +205,12 @@ class Button:
         self.app.import_graph()
     
     def __handle_autotest(self):
-        self.app.load_view("test")
+        res = self.app.load_questions()
+        if res:
+            self.app.load_view("test")
 
     def __handle_back_to_main_menu(self):
         self.app.load_view("main")
+
+    def __handle_next_question(self):
+        self.app.go_to_next_question()

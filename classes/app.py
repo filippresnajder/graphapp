@@ -3,6 +3,9 @@ import tkinter as tk
 from tkinter import filedialog
 import json
 import re
+import os
+import random
+import copy
 import networkx as nx
 
 from classes.vertex import Vertex
@@ -985,7 +988,130 @@ class App:
         return bool(re.match(hexa_code, string))
     
     def load_view(self, view):
+        """Metóda slúžiaca na načítanie pohľadu."""
+
         if self.current_view:
             self.current_view.place_forget()
         self.current_view = self.views[view]
         self.current_view.place(x=0, y=0, relwidth=1, relheight=1)
+
+    def validate_questions(self, data):
+        """"Metóda slúžiaca na validovanie otázok v JSON súbore autotestov"""
+
+        for question in data["questions"]:
+            if not isinstance(question, dict):
+                return f"Nemôžem spustiť test, lebo otázka {question} obsahuje chybu vo formáte, skontroluje JSON súbor s otázkami"
+            if not isinstance(question.get("id"), int):
+                return f"Nemôžem spustiť test, lebo otázka {question} obsahuje chybu v ID, skontroluje JSON súbor s otázkami"
+            if question.get("type") not in ["single_choice", "multiple_choice"]:
+                return f"Nemôžem spustiť test, lebo otázka {question} obsahuje chybu v možnostiach, skontroluje JSON súbor s otázkami"
+            if not isinstance(question.get("question"), str):
+                return f"Nemôžem spustiť test, lebo otázka {question} obsahuje chybu v otázke, skontroluje JSON súbor s otázkami"
+            image = question.get("image")
+            if image is not None and not isinstance(image, str):
+                return f"Nemôžem spustiť test, lebo otázka {question} obsahuje chybu v obrázku, skontroluje JSON súbor s otázkami"
+            
+            answers = question.get("answers")
+            if not isinstance(answers, list) or len(answers) == 0:
+                return f"Nemôžem spustiť test, lebo otázka {question} obsahuje chybu vo formáte odpovedí, skontroluje JSON súbor s otázkami"
+            correct_answers_count = 0
+            for answer in answers:
+                if not isinstance(answer, dict):
+                    return f"Nemôžem spustiť test, lebo otázka {question} obsahuje chybu vo formáte odpovede, skontroluje JSON súbor s otázkami"
+                if not isinstance(answer.get("id"), int):
+                    return f"Nemôžem spustiť test, lebo otázka {question} obsahuje chybu v id odpovedi, skontroluje JSON súbor s otázkami"
+                if not isinstance(answer.get("text"), str):
+                    return f"Nemôžem spustiť test, lebo otázka {question} obsahuje chybu v texte odpovedi, skontroluje JSON súbor s otázkami"
+                if not isinstance(answer.get("correct"), bool):
+                    return f"Nemôžem spustiť test, lebo otázka {question} obsahuje chybu v boolovskej hodnote odpovede, skontroluje JSON súbor s otázkami"
+                if answer.get("correct"):
+                    correct_answers_count += 1
+
+            if question["type"] == "single_choice" and correct_answers_count != 1:
+                return f"Nemôžem spustiť test, lebo otázka {question} obsahuje chybu, skontroluje JSON súbor s otázkami"
+            
+            if question["type"] == "multiple_choice" and correct_answers_count < 1:
+                return f"Nemôžem spustiť test, lebo otázka {question} obsahuje chybu, skontroluje JSON súbor s otázkami"
+
+        return True
+
+    def load_questions(self):
+        """Metóda slúžiaca na načítanie otázok."""
+
+        if self.autotest_view.question_box:
+            self.autotest_view.question_box.destroy()
+        if self.autotest_view.answer_box:
+            self.autotest_view.answer_box.destroy()
+        self.autotest_view.correct_answers.clear()
+        self.autotest_view.user_answers.clear()
+        self.autotest_view.questions.clear()
+        self.autotest_view.current_index = 0
+        self.autotest_view.is_finished = False
+        self.autotest_view.score = 0
+        self.autotest_view.maximum_score = 0
+
+        base_dir = os.path.dirname(os.path.dirname(__file__))
+        path = os.path.join(base_dir, "autotest", "questions", "questions.json")
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        validation_response = self.validate_questions(data)
+        if validation_response is not True:
+            self.main_view.infobox.clear()
+            self.main_view.infobox.log(validation_response)
+            return False
+        
+        self.autotest_view.questions = copy.deepcopy(data["questions"])
+        random.shuffle(self.autotest_view.questions)
+
+        for q in self.autotest_view.questions:
+            random.shuffle(q["answers"])
+
+        self.autotest_view.questions = self.autotest_view.questions[:5]
+
+        for question in self.autotest_view.questions:
+            for answer in question["answers"]:
+                if answer["correct"]:
+                    self.autotest_view.correct_answers.append(answer)
+                    self.autotest_view.maximum_score += 1
+
+        self.autotest_view.show_question()
+
+        return True
+
+
+    def go_to_next_question(self):
+        """Metóda slúžiaca na presunutie sa na ďalšiu otázku v autoteste."""
+
+        if self.current_view is not self.autotest_view:
+            return
+
+        if self.autotest_view.current_index < 5:
+            self.autotest_view.current_index += 1
+            if self.autotest_view.current_index == 4 and not self.autotest_view.is_finished:
+                self.autotest_view.next_question_button.button["text"] = "Ukonči test"
+            self.autotest_view.answer_box.get_user_answer(self.autotest_view.user_answers)
+            if self.autotest_view.current_index < 5:
+                self.autotest_view.show_question()
+            else:
+                self.finish_autotest()
+
+    def finish_autotest(self):
+        """"Metóda slúžiaca na vyhodnotenie autotestu."""
+
+        if self.current_view is not self.autotest_view:
+            return
+
+        if self.autotest_view.is_finished:
+            return
+        
+        self.autotest_view.next_question_button.button["text"] = "Ďalšia otázka"
+        self.autotest_view.is_finished = True
+        self.autotest_view.current_index = 0
+        for answer in self.autotest_view.user_answers:
+            if answer["correct"]:
+                self.autotest_view.score += 1
+        if len(self.autotest_view.user_answers) > len(self.autotest_view.correct_answers):
+            penalty = (len(self.autotest_view.user_answers) - len(self.autotest_view.correct_answers)) / 2
+            self.autotest_view.score -= penalty
+        self.autotest_view.show_question()
