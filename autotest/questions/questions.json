@@ -4,7 +4,7 @@
             "id": 1,
             "type": "single_choice",
             "question": "Zvýraznená cesta v grafe je najkratšia cesta z vrcholu 1 do vrcholu 5.",
-            "image": null,
+            "image": "image_1.png",
             "answers": [
                 {"id": 1, "text": "Pravda", "correct": false},
                 {"id": 2, "text": "Nepravda", "correct": true}
@@ -64,6 +64,156 @@
             "answers": [
                 {"id": 1, "text": "Pravda", "correct": true},
                 {"id": 2, "text": "Nepravda", "correct": false}
+            ]
+        },
+        {
+            "id": 7,
+            "type": "single_choice",
+            "question": "Ktorý algoritmus slúži na prehľadávanie do hĺbky?",
+            "image": null,
+            "answers": [
+                {"id": 1, "text": "BFS", "correct": false},
+                {"id": 2, "text": "DFS", "correct": true},
+                {"id": 3, "text": "Kruskal", "correct": false},
+                {"id": 4, "text": "Prim", "correct": false}
+            ]  
+        },
+        {
+            "id": 8,
+            "type": "single_choice",
+            "question": "Cesta okolo grafu, kde navštívime všetky vrcholy iba raz a skončíme v začiatočnom vrchole nazývame Hamiltonova kružnica",
+            "image": null,
+            "answers": [
+                {"id": 1, "text": "Pravda", "correct": true},
+                {"id": 2, "text": "Nepravda", "correct": false}
+            ]  
+        },
+        {
+            "id": 9,
+            "type": "single_choice",
+            "question": "Cesta okolo grafu, kde navštívime všetky hrany iba raz nazývame Eulerov ťah",
+            "image": null,
+            "answers": [
+                {"id": 1, "text": "Pravda", "correct": true},
+                {"id": 2, "text": "Nepravda", "correct": false}
+            ]  
+        },
+        {
+            "id": 10,
+            "type": "multiple_choice",
+            "question": "Algoritmy, ktoré slúžia na nájdenie najkratšej cesty v grafe sú:",
+            "image": null,
+            "answers": [
+                {"id": 1, "text": "Floyd-Warshall", "correct": true},
+                {"id": 2, "text": "Eulerov ťah", "correct": false},
+                {"id": 3, "text": "Dijkstra", "correct": true},
+                {"id": 4, "text": "Prim", "correct": false}
+            ]
+        },
+        {
+            "id": 11,
+            "type": "single_choice",
+            "question": "Primov algoritmus je greedy algoritmus.",
+            "image": null,
+            "answers": [
+                {"id": 1, "text": "Pravda", "correct": true},
+                {"id": 2, "text": "Nepravda", "correct": false}
+            ]  
+        },
+        {
+            "id": 12,
+            "type": "single_choice",
+            "question": "Vrcholy budú navštívené po použití algoritmu DFS nasledovne:",
+            "image": "image_2.png",
+            "answers": [
+                {"id": 1, "text": "1,2,4,5,3", "correct": true},
+                {"id": 2, "text": "1,2,3,4,5", "correct": false},
+                {"id": 3, "text": "1,2,4,3,5", "correct": false}
+            ]
+        },
+        {
+            "id": 13,
+            "type": "single_choice",
+            "question": "Vrcholy budú navštívené po použití algoritmu BFS nasledovne:",
+            "image": "image_2.png",
+            "answers": [
+                {"id": 1, "text": "1,2,3,4,5", "correct": true},
+                {"id": 2, "text": "1,2,4,3,5", "correct": false},
+                {"id": 3, "text": "1,2,4,5,3", "correct": false}
+            ]
+        },
+        {
+            "id": 14,
+            "type": "single_choice",
+            "question": "Použili sme algoritmus, jeho výsledok je Hamiltonova kružnica.",
+            "image": "image_3.png",
+            "answers": [
+                {"id": 1, "text": "Pravda", "correct": true},
+                {"id": 2, "text": "Nepravda", "correct": false}
+            ]
+        },
+        {
+            "id": 15,
+            "type": "single_choice",
+            "question": "Z vrcholu 1 bol aplikovaný algoritmus. Jeho výsledok je Eulerov ťah.",
+            "image": "image_4.png",
+            "answers": [
+                {"id": 1, "text": "Pravda", "correct": false},
+                {"id": 2, "text": "Nepravda", "correct": true}
+            ]
+        },
+        {
+            "id": 16,
+            "type": "single_choice",
+            "question": "Z vrcholu 3 bol aplikovaný algoritmus. Jeho výsledok je Eulerov ťah.",
+            "image": "image_5.png",
+            "answers": [
+                {"id": 1, "text": "Pravda", "correct": true},
+                {"id": 2, "text": "Nepravda", "correct": false}
+            ]
+        },
+        {
+            "id": 17,
+            "type": "single_choice",
+            "question": "Výsledok daného algoritmu, ktorý bol aplikovaný je minimálna kostra grafu.",
+            "image": "image_6.png",
+            "answers": [
+                {"id": 1, "text": "Pravda", "correct": true},
+                {"id": 2, "text": "Nepravda", "correct": false}
+            ]
+        },
+        {
+            "id": 18,
+            "type": "multiple_choice",
+            "question": "Daný výsledok vieme dosiahnuť aplikovaním algoritmov:",
+            "image": "image_6.png",
+            "answers": [
+                {"id": 1, "text": "Floyd-Warshall", "correct": false},
+                {"id": 2, "text": "Dijkstra", "correct": false},
+                {"id": 3, "text": "Kruskal", "correct": true},
+                {"id": 4, "text": "Prim", "correct": true}
+            ]
+        },
+        {
+            "id": 19,
+            "type": "multiple_choice",
+            "question": "Najkratšia cesta z vrcholu 1 do vrcholu 4 je:",
+            "image": "image_7.png",
+            "answers": [
+                {"id": 1, "text": "[1-4]", "correct": true},
+                {"id": 2, "text": "[1-2-4]", "correct": true},
+                {"id": 3, "text": "[1-2-3-4]", "correct": false}
+            ]
+        },
+        {
+            "id": 20,
+            "type": "single_choice",
+            "question": "Najkratšia cesta z vrcholu 3 do vrcholu 1 má celkovú váhu:",
+            "image": "image_7.png",
+            "answers": [
+                {"id": 1, "text": "2", "correct": false},
+                {"id": 2, "text": "4", "correct": true},
+                {"id": 3, "text": "3", "correct": false}
             ]
         }
     ]

@@ -17,7 +17,7 @@ from classes.autotest import Autotest
 from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAULT_BG_COLOR,
                        DEFAULT_TEXT_COLOR, DEFAULT_ALGORITHM_FILL, DEFAULT_ALGORITHM_NOT_FOCUSED,
                        DEFAULT_ALGORITHM_NOT_SELECTED, DEFAULT_ALGORITHM_TEXT_FILL,
-                       DEFAULT_WIDTH)
+                       DEFAULT_WIDTH, NUM_AUTOTEST_QUESTION)
 
 # TODO: Implement test section
 # TODO: Write info about algorithms in algorithm info
@@ -1067,7 +1067,7 @@ class App:
         for q in self.autotest_view.questions:
             random.shuffle(q["answers"])
 
-        self.autotest_view.questions = self.autotest_view.questions[:5]
+        self.autotest_view.questions = self.autotest_view.questions[:20]
 
         for question in self.autotest_view.questions:
             for answer in question["answers"]:
@@ -1086,12 +1086,12 @@ class App:
         if self.current_view is not self.autotest_view:
             return
 
-        if self.autotest_view.current_index < 5:
+        if self.autotest_view.current_index < NUM_AUTOTEST_QUESTION:
             self.autotest_view.current_index += 1
-            if self.autotest_view.current_index == 4 and not self.autotest_view.is_finished:
+            if self.autotest_view.current_index == NUM_AUTOTEST_QUESTION - 1 and not self.autotest_view.is_finished:
                 self.autotest_view.next_question_button.button["text"] = "Ukonči test"
             self.autotest_view.answer_box.get_user_answer(self.autotest_view.user_answers)
-            if self.autotest_view.current_index < 5:
+            if self.autotest_view.current_index < NUM_AUTOTEST_QUESTION:
                 self.autotest_view.show_question()
             else:
                 self.finish_autotest()
