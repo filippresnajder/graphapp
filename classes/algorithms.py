@@ -667,39 +667,55 @@ class Algorithms:
 
     def dijkstra_info(self):
         self.app.main_view.infobox.clear()
-        self.app.main_view.infobox.log("Informácie o Dijkstrovom algoritme.")
+        self.app.main_view.infobox.log("Dijkstrov algoritmus je pažravý algortmus, " \
+        "ktorý slúži na hľadanie najkratšej cesty v grafe, v ktorom zároveň platí, " \
+        "že všetky váhy hrán sú nezáporné. Algoritmus má využitie najmä v odvetviach " \
+        "logistiky, navigačných a dopravných systémov.")
 
     def prim_info(self):
         self.app.main_view.infobox.clear()
-        self.app.main_view.infobox.log("Informácie o Primovom algoritme.")
+        self.app.main_view.infobox.log("Primov algoritmus je pažravý algoritmus, ktorého úlohou " \
+        "je hľadanie minimálnej kostry grafu. Na rozdiel od Kruskalovho algoritmu si v Primovom algoritme " \
+        "vyberieme ľubovoľný počiatočný vrchol a v každom kroku pridávame hranu s čo najmenšou váhou, ktorá " \
+        "prepája už vytvorený strom s novým vrcholom.")
 
     def kruskal_info(self):
         self.app.main_view.infobox.clear()
-        self.app.main_view.infobox.log("Informácie o Kruskalovom algoritme.")
+        self.app.main_view.infobox.log("Kruskalov algortimus patrí medzi pažravé algoritmy, ktorého úlohou je "
+        "hľadanie minimálnej kostry grafu. Na rozdiel od Primovho algoritmu funguje Kruskalov algoritmus tak, " \
+        "že zoradí všetky hrany v grafe podľa váhy od najmenšej po najväčšiu a postupne ich pridáva do minimálnej kostry " \
+        "grafu tak, aby nevznikla kružnica.")
 
     def dfs_info(self):
         self.app.main_view.infobox.clear()
-        self.app.main_view.infobox.log("Informácie o DFS algoritme.")
+        self.app.main_view.infobox.log("DFS (Depth-First-Search) je algoritmus slúžiaci na prehľadávanie grafu do hĺbky. " \
+        "Algoritmus DFS pracuje s dátovou štruktúrou nazývanou zásobník, ktorá funguje na princípe LIFO (Last-In-First-Out). " \
+        "Algoritmus má využitie napríklad v oblasti umelej inteligencie alebo pri analýze sociálnych sieti, kde pomáha " \
+        "zistiť prepojenie používateľov.")
 
     def bfs_info(self):
         self.app.main_view.infobox.clear()
-        self.app.main_view.infobox.log("Informácie o BFS algoritme.")
-
-    def a_star_info(self):
-        self.app.main_view.infobox.clear()
-        self.app.main_view.infobox.log("Informácie o A Star algoritme.")
+        self.app.main_view.infobox.log("BFS (Breadth-First-Search) je algoritmus slúžiaci na prehľadávanie grafu do šírky. " \
+        "Pracuje s dátovou štruktúrou front, ktorá funguje na princípe FIFO (First-In-First-Out). Na rozdiel od algoritmu " \
+        "DFS, algoritmus BFS prehľadáva graf po úrovniach. Teda najskôr navštívi všetkých susedov počiatočného vrcholu, než " \
+        "sa posunie do nasledovnej úrovne.")
 
     def floyd_warshall_info(self):
         self.app.main_view.infobox.clear()
-        self.app.main_view.infobox.log("Informácie o Floyd-Warshallovom algoritme.")
+        self.app.main_view.infobox.log("Floyd-Warshallov algoritmus slúži na nájdenie najkratšej cesty medzi všetkými " \
+        "pármi vrcholov v hranovo ohodnotenom grafe. Algoritmus oproti Dijkstorovmu algoritmu funguje so zápornými hodnotami hrán, "
+        "avšak je oproti nemu výrazne časovo náročnejší.")
 
     def hamilton_cycle_info(self):
         self.app.main_view.infobox.clear()
-        self.app.main_view.infobox.log("Informácie o Hamiltonovej kružnici.")
+        self.app.main_view.infobox.log("Pod pojmom Hamiltonova kružnica chápeme cestu takú, ktorá z počiatočného vrcholu prejde všetkými vrcholmi "
+        "práve raz a zároveň sa vráti do počiatočného vrcholu.")
 
     def euler_path_info(self):
         self.app.main_view.infobox.clear()
-        self.app.main_view.infobox.log("Informácie o Eulerovom ťahu.")
+        self.app.main_view.infobox.log("Eulerov ťah v grafe je taký ťah, ktorý navštívi všetky hrany v grafe iba raz. Pre neorientovaný graf " \
+        "platí, že Eulerov ťah existuje, ak je graf súvislý a má 0 alebo 2 vrcholy s nepárnym stupňom. Pre orientovaný graf platí, " \
+        "že Eulerov ťah existuje, ak je graf slabo súvislý a všetky vrcholy majú rovnaký vstupný a výstupný stupeň. ")
 
     
     def __is_graph_oriented(self):
