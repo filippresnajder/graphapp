@@ -568,22 +568,19 @@ class App:
         self.main_view.infobox.log("V grafe sú splnené podmienky pre Eulerov ťah")
         self.main_view.infobox.log(f"Kontrolujem, či existuje Eulerov ťah z počiatočného vrcholu {start_vertex}")
 
-        for vertex in path:
-            self.main_view.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
-            self.main_view.canvas.itemconfig(vertex.canvas_text, fill=DEFAULT_ALGORITHM_TEXT_FILL)
-
-        for edge in self.edges:
-            if edge in used_edges:
-                self.main_view.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
-            else:
-                self.main_view.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_NOT_FOCUSED)
-
         if len(used_edges) != len(self.edges):
             self.main_view.infobox.log(f"Eulerov ťah z vrcholu {start_vertex} neexistuje")
             self.main_view.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")
         else:
             self.main_view.infobox.log(f"Eulerov ťah z vrcholu {start_vertex} existuje")
-            self.main_view.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")        
+            self.main_view.infobox.log("Ukončujem algoritmus, pomocou šípiek nižšie je možné si prezrieť výpočet algoritmu")
+            for vertex in path:
+                self.main_view.canvas.itemconfig(vertex.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)
+                self.main_view.canvas.itemconfig(vertex.canvas_text, fill=DEFAULT_ALGORITHM_TEXT_FILL)
+
+            for edge in self.edges:
+                if edge in used_edges:
+                    self.main_view.canvas.itemconfig(edge.canvas_object_id, fill=DEFAULT_ALGORITHM_FILL)     
 
         self.algorithm_state = {
             "index": -1, 
