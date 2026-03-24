@@ -19,9 +19,6 @@ from constants import (RADIUS, DEFAULT_OUTLINE_COLOR, DEFAULT_FILL_COLOR, DEFAUL
                        DEFAULT_ALGORITHM_NOT_SELECTED, DEFAULT_ALGORITHM_TEXT_FILL,
                        DEFAULT_WIDTH, NUM_AUTOTEST_QUESTION)
 
-# TODO: Implement test section
-# TODO: Write info about algorithms in algorithm info
-
 # LATER TODO: Zdroje k pseudokodom
 
 class App:
