@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import filedialog
 import json
 import re
+import sys
 import os
 import random
 import copy
@@ -1045,7 +1046,7 @@ class App:
         self.autotest_view.maximum_score = 0
 
         base_dir = os.path.dirname(os.path.dirname(__file__))
-        path = os.path.join(base_dir, "autotest", "questions", "questions.json")
+        path = self.resource_path(os.path.join("autotest", "questions", "questions.json"))
         with open(path, "r", encoding="utf-8") as f:
             data = json.load(f)
 
@@ -1109,3 +1110,11 @@ class App:
             penalty = (len(self.autotest_view.user_answers) - len(self.autotest_view.correct_answers)) / 2
             self.autotest_view.score -= penalty
         self.autotest_view.show_question()
+
+    def resource_path(self, relative_path):
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+
+        return os.path.join(base_path, relative_path)

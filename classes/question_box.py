@@ -12,7 +12,7 @@ class QuestionBox(tk.Frame):
 
         if question["image"]:
             base_dir = os.path.dirname(os.path.dirname(__file__))
-            path = os.path.join(base_dir, "autotest", "questions", "images", question["image"])
+            path = self.parent.app.resource_path(os.path.join(base_dir, "autotest", "questions", "images", question["image"]))
             image = Image.open(path)
             resized_image = image.resize((355, 200))
             self.img = ImageTk.PhotoImage(resized_image)
