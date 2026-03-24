@@ -113,7 +113,7 @@
         {
             "id": 11,
             "type": "single_choice",
-            "question": "Primov algoritmus je greedy algoritmus.",
+            "question": "Primov algoritmus je pažravý algoritmus slúžiaci na nájdenie minimálnej kostry grafu.",
             "image": null,
             "answers": [
                 {"id": 31, "text": "Pravda", "correct": true},
